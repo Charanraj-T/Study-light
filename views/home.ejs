@@ -1,223 +1,202 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Study light</title>
-    <link rel="icon" type="image/png" sizes="64*64" href="images/lightbulb.png">
-    
-    <!-- fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>    
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Roboto:wght@500&family=Pacifico&display=swap" rel="stylesheet">
-    
-    <!-- fontawesome -->
-    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
+<%- include('partials/header') %>
 
-    <!-- stylesheets -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <!-- homepage -->
-    <section id="home">
-        <div class="row">
-            <div class="col-lg-5">
-                <img src="images/laptop.webp" class="d-block w-100" alt="laptop">
-            </div>        
-            <div class="col-lg-7">
-                <h1 class="main-heading py-2">Study light</h1>
-                <h3 class="h3 sub-heading m-4">One platform to meet all your teaching and learning needs!</h3>
-                <a class="btn btn-outline-light btn-lg p-3 m-3" data-bs-toggle="modal" href="#register">Register</a>
-                <a class="btn btn-outline-light btn-lg p-3 m-3" data-bs-toggle="modal" href="#login">Login</a>
-            </div>
+<!-- homepage -->
+<section id="home">
+    <div class="row">
+        <div class="col-lg-5">
+            <img src="images/laptop.webp" class="d-block w-100" alt="laptop">
+        </div>        
+        <div class="col-lg-7">
+            <h1 class="main-heading py-2">Study light</h1>
+            <h3 class="h3 sub-heading m-4">One platform to meet all your teaching and learning needs!</h3>
+            <a class="btn btn-outline-light btn-lg p-3 m-3" data-bs-toggle="modal" href="#register">Register</a>
+            <a class="btn btn-outline-light btn-lg p-3 m-3" data-bs-toggle="modal" href="#login">Login</a>
         </div>
-        <div class="text-center">
-            <a class="p-3 m-3" href="#features">Features</a>
-            <a class="p-3 m-3" href="#contact">Contact</a>
-        </div>
-    </section>
-    
-    <!-- teacher features -->
-    <section id="features" class="bg-light">
-        <h2 class="h2 text-center p-3 m-3">Features in <span class="fname">Study light</span></h2>
-        <div class="row w-100">
-            <div class="col-lg-6">
-                <div class="card mx-auto w-100" style="width: 18rem;">
-                    <img src="images/teacher.jpeg" class="card-img-top" alt="teacher">
-                    <div class="card-body">
-                        <h5 class="card-title">Teachers</h5>
-                        <p class="card-text">Teaching students is never made this easy</p>
-                    </div>
-                    <div>
-                        <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Create classrooms</li>
-                        <li class="list-group-item">Post assignments</li>
-                        <li class="list-group-item">Create and post tests</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="card mx-auto w-100" style="width: 18rem;">
-                    <img src="images/student.jpeg" class="card-img-top" alt="student">
-                    <div class="card-body">
-                        <h5 class="card-title">Students</h5>
-                        <p class="card-text">Learn at your convenient place and time</p>
-                    </div>
-                    <div>
-                        <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Join classrooms</li>
-                        <li class="list-group-item">Take assignments and tests</li>
-                        <li class="list-group-item">Make timetables</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    </div>
+    <div class="text-center">
+        <a class="p-3 m-3" href="#features">Features</a>
+        <a class="p-3 m-3" href="#contact">Contact</a>
+    </div>
+</section>
 
-    <!-- footer  -->
-    <footer id="contact">
-        <div class="container-fluid text-white">
-            <p>For any queries, contact <a href = "mailto: studylight@gmail.com">Studylight@gmail.com</a></p>
-            <p>© Copyright 2021 <span class="bname">Study light</span></p>                
-        </div>
-    </footer>
-
-    <!-- register -->
-    <div class="modal fade" id="register" tabindex="-1" aria-labelledby="registerLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <ul class="nav nav-tabs" id="registerTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link active" id="sturegtab" data-bs-toggle="tab" 
-                  data-bs-target="#stureg" type="button" role="tab" aria-controls="stureg" aria-selected="true">
-                  <h5 class="modal-title h5" id="sturegisterLabel">Student register</h5></button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link" id="tearegtab" data-bs-toggle="tab" 
-                  data-bs-target="#teareg" type="button" role="tab" aria-controls="teareg" aria-selected="false">
-                  <h5 class="modal-title h5" id="tearegisterLabel">Teacher register</h5></button>
-                </li>
-              </ul>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- teacher features -->
+<section id="features" class="bg-light">
+    <h2 class="h2 text-center p-3 m-3">Features in <span class="fname">Study light</span></h2>
+    <div class="row w-100">
+        <div class="col-lg-6">
+            <div class="card mx-auto w-100" style="width: 18rem;">
+                <img src="images/teacher.jpeg" class="card-img-top" alt="teacher">
+                <div class="card-body">
+                    <h5 class="card-title">Teachers</h5>
+                    <p class="card-text">Teaching students is never made this easy</p>
+                </div>
+                <div>
+                    <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Create classrooms</li>
+                    <li class="list-group-item">Post assignments</li>
+                    <li class="list-group-item">Create and post tests</li>
+                    </ul>
+                </div>
             </div>
-            <div class="modal-body">
-              <div class="tab-content" id="registerTabContent">
-                <div class="tab-pane fade show active" id="stureg" role="tabpanel" aria-labelledby="sturegtab">
-                  <form action="/stureg" method="POST">
-                    <div class="mb-3">
-                      <label for="name" class="col-form-label">Name:</label>
-                      <input type="text" class="form-control" id="name">
-                    </div>
-                    <div class="mb-3">
-                      <label for="email" class="col-form-label">Email:</label>
-                      <input type="email" class="form-control" id="email">
-                    </div>
-                    <div class="mb-3">
-                      <label for="phone" class="col-form-label">Phone:</label>
-                      <input type="number" class="form-control" id="phone">
-                    </div>
-                    <div class="mb-3">
-                      <label for="password" class="col-form-label">Password:</label>
-                      <input type="text" class="form-control" id="password">
-                    </div>
-                    <div class="mb-3">
-                      <button class="btn btn-primary btn-block w-100 p-2 m-2" type="submit">Register as student</button>
-                      <a class="btn btn-success btn-block w-100 p-2 m-2"><i class="fab fa-google"></i> Register using google</a>
-                    </div>
-                  </form>
+        </div>
+        <div class="col-lg-6">
+            <div class="card mx-auto w-100" style="width: 18rem;">
+                <img src="images/student.jpeg" class="card-img-top" alt="student">
+                <div class="card-body">
+                    <h5 class="card-title">Students</h5>
+                    <p class="card-text">Learn at your convenient place and time</p>
                 </div>
-                <div class="tab-pane fade" id="teareg" role="tabpanel" aria-labelledby="tearegtab">
-                  <form action="/teareg" method="POST">
-                    <div class="mb-3">
-                      <label for="name" class="col-form-label">Name:</label>
-                      <input type="text" class="form-control" id="name">
-                    </div>
-                    <div class="mb-3">
-                      <label for="email" class="col-form-label">Email:</label>
-                      <input type="email" class="form-control" id="email">
-                    </div>
-                    <div class="mb-3">
-                      <label for="phone" class="col-form-label">Phone:</label>
-                      <input type="number" class="form-control" id="phone">
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="col-form-label">Password:</label>
-                        <input type="text" class="form-control" id="password">
-                    </div>
-                    <div class="mb-3">
-                      <button class="btn btn-primary btn-block w-100 p-2 m-2" type="submit">Register as teacher</button>
-                      <a class="btn btn-success btn-block w-100 p-2 m-2"><i class="fab fa-google"></i> Register using google</a>
-                    </div>
-                  </form>
+                <div>
+                    <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Join classrooms</li>
+                    <li class="list-group-item">Take assignments and tests</li>
+                    <li class="list-group-item">Make timetables</li>
+                    </ul>
                 </div>
-              </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- footer  -->
+<footer id="contact">
+    <div class="container-fluid text-white">
+        <p>For any queries, contact <a href = "mailto: studylight@gmail.com">Studylight@gmail.com</a></p>
+        <p>© Copyright 2021 <span class="bname">Study light</span></p>                
+    </div>
+</footer>
+
+<!-- register -->
+<div class="modal fade" id="register" tabindex="-1" aria-labelledby="registerLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <ul class="nav nav-tabs" id="registerTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="sturegtab" data-bs-toggle="tab" 
+              data-bs-target="#stureg" type="button" role="tab" aria-controls="stureg" aria-selected="true">
+              <h5 class="modal-title h5" id="sturegisterLabel">Student register</h5></button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="tearegtab" data-bs-toggle="tab" 
+              data-bs-target="#teareg" type="button" role="tab" aria-controls="teareg" aria-selected="false">
+              <h5 class="modal-title h5" id="tearegisterLabel">Teacher register</h5></button>
+            </li>
+          </ul>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="tab-content" id="registerTabContent">
+            <div class="tab-pane fade show active" id="stureg" role="tabpanel" aria-labelledby="sturegtab">
+              <form action="/stureg" method="POST">
+                <div class="mb-3">
+                  <label for="name" class="col-form-label">Name:</label>
+                  <input type="text" class="form-control" id="name" name="name">
+                </div>
+                <div class="mb-3">
+                  <label for="email" class="col-form-label">Email:</label>
+                  <input type="email" class="form-control" id="email" name="email">
+                </div>
+                <div class="mb-3">
+                  <label for="phone" class="col-form-label">Phone:</label>
+                  <input type="number" class="form-control" id="phone" name="phone">
+                </div>
+                <div class="mb-3">
+                  <label for="password" class="col-form-label">Password:</label>
+                  <input type="text" class="form-control" id="password" name="password">
+                </div>
+                <div class="mb-3">
+                  <button class="btn btn-primary btn-block w-100 p-2 m-2" type="submit">Register as student</button>
+                  <a class="btn btn-success btn-block w-100 p-2 m-2"><i class="fab fa-google"></i> Register using google</a>
+                </div>
+              </form>
+            </div>
+            <div class="tab-pane fade" id="teareg" role="tabpanel" aria-labelledby="tearegtab">
+              <form action="/teareg" method="POST">
+                <div class="mb-3">
+                  <label for="name" class="col-form-label">Name:</label>
+                  <input type="text" class="form-control" id="name" name="name">
+                </div>
+                <div class="mb-3">
+                  <label for="email" class="col-form-label">Email:</label>
+                  <input type="email" class="form-control" id="email" name="email">
+                </div>
+                <div class="mb-3">
+                  <label for="phone" class="col-form-label">Phone:</label>
+                  <input type="number" class="form-control" id="phone" name="phone">
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="col-form-label">Password:</label>
+                    <input type="text" class="form-control" id="password" name="password">
+                </div>
+                <div class="mb-3">
+                  <button class="btn btn-primary btn-block w-100 p-2 m-2" type="submit">Register as teacher</button>
+                  <a class="btn btn-success btn-block w-100 p-2 m-2"><i class="fab fa-google"></i> Register using google</a>
+                </div>
+              </form>
             </div>
           </div>
         </div>
+      </div>
     </div>
-    <!-- login -->
-    <div class="modal fade" id="login" tabindex="-1" aria-labelledby="loginLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <ul class="nav nav-tabs" id="registerTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link active" id="stulogtab" data-bs-toggle="tab" 
-                  data-bs-target="#stulog" type="button" role="tab" aria-controls="stulog" aria-selected="true">
-                  <h5 class="modal-title h5" id="sturegisterLabel">Student Login</h5></button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button class="nav-link" id="tealogtab" data-bs-toggle="tab" 
-                  data-bs-target="#tealog" type="button" role="tab" aria-controls="tealog" aria-selected="false">
-                  <h5 class="modal-title h5" id="tealoginLabel">Teacher Login</h5></button>
-                </li>
-              </ul>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<!-- login -->
+<div class="modal fade" id="login" tabindex="-1" aria-labelledby="loginLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <ul class="nav nav-tabs" id="registerTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="stulogtab" data-bs-toggle="tab" 
+              data-bs-target="#stulog" type="button" role="tab" aria-controls="stulog" aria-selected="true">
+              <h5 class="modal-title h5" id="sturegisterLabel">Student Login</h5></button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="tealogtab" data-bs-toggle="tab" 
+              data-bs-target="#tealog" type="button" role="tab" aria-controls="tealog" aria-selected="false">
+              <h5 class="modal-title h5" id="tealoginLabel">Teacher Login</h5></button>
+            </li>
+          </ul>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="tab-content" id="loginTabContent">
+            <div class="tab-pane fade show active" id="stulog" role="tabpanel" aria-labelledby="stulogtab">
+              <form action="/stulog" method="POST">
+                <div class="mb-3">
+                  <label for="email" class="col-form-label">Email:</label>
+                  <input type="name" class="form-control" id="email" name="email">
+                </div>
+                <div class="mb-3">
+                  <label for="password" class="col-form-label">Password:</label>
+                  <input type="password" class="form-control" id="password" name="password">
+                </div>
+                <div class="mb-3">
+                  <button class="btn btn-primary btn-block w-100 p-2 m-2" type="submit">Login as student</button>
+                  <a class="btn btn-success btn-block w-100 p-2 m-2"><i class="fab fa-google"></i> Login using google</a>
+                </div>
+              </form>
             </div>
-            <div class="modal-body">
-              <div class="tab-content" id="loginTabContent">
-                <div class="tab-pane fade show active" id="stulog" role="tabpanel" aria-labelledby="stulogtab">
-                  <form action="/stulog" method="POST">
-                    <div class="mb-3">
-                      <label for="email" class="col-form-label">Email:</label>
-                      <input type="email" class="form-control" id="email">
-                    </div>
-                    <div class="mb-3">
-                      <label for="password" class="col-form-label">Password:</label>
-                      <input type="password" class="form-control" id="password">
-                    </div>
-                    <div class="mb-3">
-                      <button class="btn btn-primary btn-block w-100 p-2 m-2" type="submit">Login as student</button>
-                      <a class="btn btn-success btn-block w-100 p-2 m-2"><i class="fab fa-google"></i> Login using google</a>
-                    </div>
-                  </form>
+            <div class="tab-pane fade" id="tealog" role="tabpanel" aria-labelledby="tealogtab">
+              <form action="/tealog" method="POST">
+                <div class="mb-3">
+                  <label for="email" class="col-form-label">Email:</label>
+                  <input type="email" class="form-control" id="email" name="email">
                 </div>
-                <div class="tab-pane fade" id="tealog" role="tabpanel" aria-labelledby="tealogtab">
-                  <form action="/tealog" method="POST">
-                    <div class="mb-3">
-                      <label for="email" class="col-form-label">Email:</label>
-                      <input type="email" class="form-control" id="email">
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="col-form-label">Password:</label>
-                        <input type="password" class="form-control" id="password">
-                    </div>
-                    <div class="mb-3">
-                      <button class="btn btn-primary btn-block w-100 p-2 m-2" type="submit">Login as teacher</button>
-                      <a class="btn btn-success btn-block w-100 p-2 m-2"><i class="fab fa-google"></i> Login using google</a>
-                    </div>
-                  </form>
+                <div class="mb-3">
+                    <label for="password" class="col-form-label">Password:</label>
+                    <input type="password" class="form-control" id="password" name="password">
                 </div>
-              </div>
+                <div class="mb-3">
+                  <button class="btn btn-primary btn-block w-100 p-2 m-2" type="submit">Login as teacher</button>
+                  <a class="btn btn-success btn-block w-100 p-2 m-2"><i class="fab fa-google"></i> Login using google</a>
+                </div>
+              </form>
             </div>
           </div>
         </div>
+      </div>
     </div>
-    <!-- script -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-</body>
-</html>
+</div>
+
+<%- include('partials/footer') %>
