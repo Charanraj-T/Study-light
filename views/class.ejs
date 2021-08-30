@@ -23,9 +23,9 @@
                 <button type="button" class="btn btn-outline-light" onclick="copy()"><%= code %></button>
             </div>
             <div class="col-lg-4 text-center">
-              <button type="submit" name="postl" id="postl" data-bs-toggle="modal" data-bs-target="#postModal" class="w-75 mb-2 btn btn-lg btn-outline-light">Post</button>
-              <button type="button" name="testl" id="testl" data-bs-toggle="modal" data-bs-target="#testModal" class="w-75 mb-2 btn btn-lg btn-outline-light">Test</button>
-              <button type="button" name="assignl" id="assignl" data-bs-toggle="modal" data-bs-target="#assignModal" class="w-75 mb-2 btn btn-lg btn-outline-light">Assignment</button>
+              <button type="submit" name="postl" id="postl" data-bs-toggle="modal" data-bs-target="#postModal" class="w-75 mb-2 btn btn-lg btn-outline-light">Make a post</button>
+              <button type="button" name="testl" id="testl" data-bs-toggle="modal" data-bs-target="#testModal" class="w-75 mb-2 btn btn-lg btn-outline-light">Create a Test</button>
+              <button type="button" name="assignl" id="assignl" data-bs-toggle="modal" data-bs-target="#assignModal" class="w-75 mb-2 btn btn-lg btn-outline-light">New Assignment</button>
             </div>
         </div>
     </div>    
@@ -80,7 +80,9 @@
                     <% }else{ %>
                       <% for(var i=posts.length-1;i >=0 ;i--){ %>
                           <div class="card border-dark mb-3 w-100">
-                              <div class="card-header"><%= posts[i].name %> posted on <%= posts[i].posttime %></div>
+                              <div class="card-header">
+                                <p class="fs-6"><%= posts[i].author %> posted on <%= posts[i].posttime %></p>
+                              </div>
                               <div class="card-body text-dark">
                                 <p class="card-title"><%= posts[i].title %></p>
                                 <p class="card-text"><%= posts[i].description %></p>
@@ -90,28 +92,30 @@
                     <%}%>
                 </div>
                 <div class="tab-pane p-3 fade" id="testc" role="tabpanel" aria-labelledby="test-tab">
-                    <% for (var i=0;i< 10;i++){ %>
-                        <div class="card border-dark mb-3 w-100">
-                            <div class="card-header">Header</div>
-                            <div class="card-body text-dark">
-                              <p class="card-title">Dark card title</p>
-                              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                            </div>
-                        </div>
-                    <%}%>
+                  <div class="card border-dark mb-3 w-100">
+                    <div class="card-header">No tests yet...</div>
+                    <div class="card-body text-dark">
+                      <p class="card-text">Click test button to create a new test</p>
+                    </div>
+                  </div>
                 </div>
                 <div class="tab-pane p-3 fade" id="assignc" role="tabpanel" aria-labelledby="assign-tab">
-                    <% for (var i=0;i< 10;i++){ %>
-                        <div class="card border-dark mb-3 w-100">
-                            <div class="card-header">Header</div>
-                            <div class="card-body text-dark">
-                              <p class="card-title">Dark card title</p>
-                              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                            </div>
-                        </div>
-                    <%}%>
+                  <div class="card border-dark mb-3 w-100">
+                    <div class="card-header">No assignments yet...</div>
+                    <div class="card-body text-dark">
+                      <p class="card-text">Click assignment button to make a new assignment</p>
+                    </div>
+                  </div>
                 </div>
                 <div class="tab-pane p-3 fade" id="studentc" role="tabpanel" aria-labelledby="student-tab">
+                  <% if(students.length==0){ %>
+                    <div class="card border-dark mb-3 w-100">
+                      <div class="card-header">No students joined...</div>
+                      <div class="card-body text-dark">
+                        <p class="card-text">Copy code and share it to students so that they can join to this class</p>
+                      </div>
+                    </div>  
+                  <% }else{ %>
                     <div class="row">
                         <% students.forEach((student)=>{ %>
                             <div class="col-lg-3 col-md-6">
@@ -122,6 +126,7 @@
                             </div>
                         <%});%>
                     </div>
+                  <%}%>
                 </div>
             </div>
         </div>
@@ -180,14 +185,14 @@
             <input type="text" class="form-control" id="qnlink" name="qnlink">
           </div>
           <div class="mb-3">
-            <label for="due" class="col-form-label">Title:</label>
+            <label for="due" class="col-form-label">Due date:</label>
             <input type="date" class="form-control" id="due" name="due">
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Create test</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Create test</button>
       </div>
     </div>
   </div>
@@ -215,34 +220,17 @@
             <input type="text" class="form-control" id="qnlink" name="qnlink">
           </div>
           <div class="mb-3">
-            <label for="due" class="col-form-label">Title:</label>
+            <label for="due" class="col-form-label">Due date:</label>
             <input type="date" class="form-control" id="due" name="due">
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Create assignment</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Create assignment</button>
       </div>
     </div>
   </div>
-</div>
-
-<div class="modal" tabindex="-1" id="modal">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Enter name for your class</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <input type="text" name="name" class="form-control" id="classname">
-            <div class="text-center">
-                <button type="button" class="btn btn-primary text-center m-3" onclick="formsubmit(this)" name="cc">Create class</button>
-            </div>
-        </div>
-      </div>
-    </div>
 </div>
 
 <script>

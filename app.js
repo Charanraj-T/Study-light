@@ -92,6 +92,50 @@ app.post("/cpost",(req,res)=>{
     });
 });
 
+app.post("/scpost",(req,res)=>{
+    Class.findOne({code:req.body.code},(e,foundClass)=>{
+        if(e){
+            console.log(e);
+        }else{
+            Student.findOne({email:req.body.email},(e,foundUser)=>{
+                if(e){
+                    console.log(e);
+                }else{
+                    const newPost =  new Post({
+                        author:foundUser.name,
+                        title:req.body.title,
+                        description:req.body.desc,
+                        posttime: new Date().toString().slice(4,24)
+                    });
+                    newPost.save((e)=>{
+                        if(e){
+                            console.log(e);
+                        }else{
+                            foundClass.posts.push(newPost);
+                            foundClass.save((e)=>{
+                                Student.find().where('_id').in(foundClass.students).exec((err, records) => {
+                                    if(err){
+                                        console.log(err);
+                                    }else{
+                                        res.render("sclass",{
+                                            code:foundClass.code,
+                                            name:foundClass.teacher,
+                                            email:req.body.email,
+                                            classname:foundClass.name,
+                                            students:records,
+                                            posts:foundClass.posts
+                                        });
+                                    }
+                                });
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    });
+});
+
 app.post("/home",(req,res)=>{
     Teacher.findOne({email:req.body.email},(e,foundUser)=>{
         if(e){
@@ -148,10 +192,19 @@ app.post("/sclass",(req,res)=>{
         if(e){
             console.log(e);
         }else{
-            res.render("sclass",{
-                name:foundClass.teacher,
-                email:req.body.email,
-                classname:foundClass.name
+            Student.find().where('_id').in(foundClass.students).exec((err, records) => {
+                if(err){
+                    console.log(err);
+                }else{
+                    res.render("sclass",{
+                        name:foundClass.teacher,
+                        email:req.body.email,
+                        classname:foundClass.name,
+                        students:records,
+                        code:foundClass.code,
+                        posts:foundClass.posts
+                    });
+                }
             });
         }
     });
@@ -213,20 +266,38 @@ app.post("/joinclass",(req,res)=>{
                         console.log(e);
                     }else{
                         if(foundUser.classes.some(e => e.code == req.body.code)){
-                            res.render("sclass",{
-                                email:foundUser.email,
-                                classname:foundClass.name,
-                                name:foundClass.teacher
+                            Student.find().where('_id').in(foundClass.students).exec((err, records) => {
+                                if(err){
+                                    console.log(err);
+                                }else{
+                                    res.render("sclass",{
+                                        name:foundClass.teacher,
+                                        email:req.body.email,
+                                        classname:foundClass.name,
+                                        students:records,
+                                        code:foundClass.code,
+                                        posts:foundClass.posts
+                                    });
+                                }
                             });
                         }else{
                             foundUser.classes.push(foundClass);
                             foundUser.save();
                             foundClass.students.push(foundUser._id);
                             foundClass.save();
-                            res.render("sclass",{
-                                email:foundUser.email,
-                                classname:foundClass.name,
-                                name:foundClass.teacher
+                            Student.find().where('_id').in(foundClass.students).exec((err, records) => {
+                                if(err){
+                                    console.log(err);
+                                }else{
+                                    res.render("sclass",{
+                                        name:foundClass.teacher,
+                                        email:req.body.email,
+                                        classname:foundClass.name,
+                                        students:records,
+                                        code:foundClass.code,
+                                        posts:foundClass.posts
+                                    });
+                                }
                             });
                         }
                     }

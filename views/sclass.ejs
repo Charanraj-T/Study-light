@@ -16,8 +16,135 @@
                 <h2 class="h2 p-2"><%= classname %></h2>
                 <h4 class="h4 p-2">Staff : <%= name %></h4>
             </div>
+            <div class="col-lg-6 text-center">
+                <button type="submit" name="postl" id="postl" data-bs-toggle="modal" data-bs-target="#postModal" class="w-75 mb-2 btn btn-lg btn-outline-light">Make a post</button>
+            </div>
         </div>
     </div>    
 </section>
+
+
+<section id="classstream">
+    <div class="row w-100">
+        <div class="col-lg-3 px-3">
+            <div class="card mx-auto text-center my-3 border-dark" style="max-width: 18rem;">
+                <div class="card-header text-white">    
+                  <h3 class="h3 card-title">Tests pending</h3>
+                </div>
+                <div class="card-body bg-light">
+                  <i class="fas fa-3x p-3 fa-check-circle"></i>
+                  <p class="card-text">All completed</p>
+                </div>
+            </div>
+            <div class="card mx-auto text-center my-3 border-dark" style="max-width: 18rem;">
+                <div class="card-header text-white">   
+                  <h3 class="h3 card-title">Assignments</h3>
+                </div>
+                <div class="card-body bg-light">
+                  <i class="fas fa-3x p-3 fa-check-circle"></i>
+                  <p class="card-text">All completed</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-9 p-3">
+            <ul class="nav nav-tabs" id="streamTab" role="tablist">
+                <li class="nav-item w-25" role="presentation">
+                  <button class="nav-link active w-100" id="post-tab" data-bs-toggle="tab" data-bs-target="#postc" type="button" role="tab" aria-controls="home" aria-selected="true">Posts</button>
+                </li>
+                <li class="nav-item w-25" role="presentation">
+                  <button class="nav-link w-100" id="test-tab" data-bs-toggle="tab" data-bs-target="#testc" type="button" role="tab" aria-controls="profile" aria-selected="false">Tests</button>
+                </li>
+                <li class="nav-item w-25" role="presentation">
+                  <button class="nav-link w-100" id="assign-tab" data-bs-toggle="tab" data-bs-target="#assignc" type="button" role="tab" aria-controls="contact" aria-selected="false">Assignments</button>
+                </li>
+                <li class="nav-item w-25" role="presentation">
+                    <button class="nav-link w-100" id="student-tab" data-bs-toggle="tab" data-bs-target="#studentc" type="button" role="tab" aria-controls="contact" aria-selected="false">Students</button>
+                </li>
+            </ul>
+            <div class="tab-content" id="streamTabContent">
+                <div class="tab-pane p-3 fade show active" id="postc" role="tabpanel" aria-labelledby="post-tab">
+                    <% if(posts.length==0){ %>
+                      <div class="card border-dark mb-3 w-100">
+                        <div class="card-header">No posts yet...</div>
+                        <div class="card-body text-dark">
+                          <p class="card-text">Click post button to make a new post</p>
+                        </div>
+                      </div>  
+                    <% }else{ %>
+                      <% for(var i=posts.length-1;i >=0 ;i--){ %>
+                          <div class="card border-dark mb-3 w-100">
+                              <div class="card-header">
+                                <p class="fs-6"><%= posts[i].author %> posted on <%= posts[i].posttime %></p>
+                              </div>
+                              <div class="card-body text-dark">
+                                <p class="card-title"><%= posts[i].title %></p>
+                                <p class="card-text"><%= posts[i].description %></p>
+                              </div>
+                          </div>
+                      <%}%>
+                    <%}%>
+                </div>
+                <div class="tab-pane p-3 fade" id="testc" role="tabpanel" aria-labelledby="test-tab">
+                  <div class="card border-dark mb-3 w-100">
+                    <div class="card-header">No tests yet...</div>
+                    <div class="card-body text-dark">
+                      <p class="card-text">Check back later</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-pane p-3 fade" id="assignc" role="tabpanel" aria-labelledby="assign-tab">
+                  <div class="card border-dark mb-3 w-100">
+                    <div class="card-header">No assignments yet...</div>
+                    <div class="card-body text-dark">
+                      <p class="card-text">Check back later</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-pane p-3 fade" id="studentc" role="tabpanel" aria-labelledby="student-tab">
+                    <div class="row">
+                        <% students.forEach((student)=>{ %>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card border-dark text-center">
+                                    <i class="fas fa-2x p-2 fa-user-circle"></i>
+                                    <p class="p-1"><%= student.name %></p>
+                                </div>
+                            </div>
+                        <%});%>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="postModal" tabindex="-1" aria-labelledby="postl" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">New post</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form method="POST" action="/scpost">
+          <div class="modal-body">
+            <input type="hidden" name="code" value=<%= code %>>
+            <input type="hidden" name="email" value=<%= email %>>
+            <div class="mb-3">
+              <label for="title" class="col-form-label">Title:</label>
+              <input type="text" class="form-control" id="title" name="title">
+            </div>
+            <div class="mb-3">
+              <label for="desc" class="col-form-label">Message:</label>
+              <textarea class="form-control" id="desc" name="desc"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Send post</button>
+          </div>
+        </form>
+      </div>
+    </div>
+</div>
+  
 
 <%- include('partials/footer') %>
