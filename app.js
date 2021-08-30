@@ -9,12 +9,22 @@ app.use(express.urlencoded({extended:true}));
 app.use(express.static("public"));
 
 mongoose.connect("mongodb://localhost:27017/studyDB", {useNewUrlParser: true});
+ 
+const classSchema = new mongoose.Schema ({
+    name:String,
+    code:String,
+    teacher: String,
+    student:[String]
+});
+
+const Class = new mongoose.model("Class", classSchema);
 
 const studentSchema = new mongoose.Schema ({
     name:String,
     email: String,
     password: String,
-    phone:Number
+    phone:Number,
+    classes:[classSchema]
 });
     
 const Student = new mongoose.model("Student", studentSchema);
@@ -23,21 +33,86 @@ const teacherSchema = new mongoose.Schema ({
     name:String,
     email: String,
     password: String,
-    phone:Number
+    phone:Number,
+    classes:[classSchema]
 });
     
 const Teacher = new mongoose.model("Teacher", teacherSchema);
-    
+   
 app.get("/",(req,res)=>{
     res.render("home");
 });
 
-app.get("/student",(req,res)=>{
-    res.render("student");
+app.post("/home",(req,res)=>{
+    Teacher.findOne({email:req.body.email},(e,foundUser)=>{
+        if(e){
+            console.log(e);
+        }else{
+            res.render("teacher",{
+                name:foundUser.name,
+                email:foundUser.email,
+                classes:foundUser.classes
+            });
+        }
+    });
 });
 
-app.get("/teacher",(req,res)=>{
-    res.render("teacher");
+app.post("/class",(req,res)=>{
+    Class.findOne({code:req.body.code},(e,foundClass)=>{
+        if(e){
+            console.log(e);
+        }else{
+            res.render("class",{
+                code:foundClass.code,
+                name:foundClass.teacher,
+                email:req.body.email,
+                classname:foundClass.name
+            });
+        }
+    });
+});
+
+app.post("/createclass",(req,res)=>{
+    Class.count({}, function( err, count){
+        if(err){
+            console.log(err);
+        }else{
+            Teacher.findOne({email:req.body.email},(e,foundUser)=>{
+                if(e){
+                    console.log(e);
+                }else{
+                    if(foundUser.classes.some(e => e.name == req.body.classname)){
+                        alert("classroom exists already");
+                        res.render("teacher",{
+                            name:req.body.name,
+                            email: req.body.email,
+                            classes:foundUser.classes
+                        });
+                    }else{
+                        const newClass =  new Class({
+                            teacher:req.body.name,
+                            name:req.body.classname,
+                            code:"sl"+String(count+1).padStart(4,'0')
+                        });
+                        foundUser.classes.push(newClass);
+                        foundUser.save();
+                        newClass.save(function(err){
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                res.render("class",{
+                                    code:"sl"+String(count+1).padStart(4,'0'),
+                                    name:req.body.name,
+                                    classname:req.body.classname,
+                                    email:foundUser.email
+                                });
+                            }
+                        }); 
+                    }
+                }
+            });
+        } 
+    });
 });
 
 app.post("/stureg", function(req, res){
@@ -65,7 +140,10 @@ app.post("/stureg", function(req, res){
                             if (err) {
                                 console.log(err);
                             } else {
-                                res.redirect("/student");
+                                res.render("student",{
+                                    name:req.body.name,
+                                    email: req.body.email
+                                });
                             }
                         });
                     }
@@ -100,7 +178,11 @@ app.post("/teareg", function(req, res){
                             if (err) {
                                 console.log(err);
                             } else {
-                                res.redirect("/teacher");
+                                res.render("teacher",{
+                                    name:req.body.name,
+                                    email: req.body.email,
+                                    classes:[]
+                                });
                             }
                         });
                     }
@@ -121,7 +203,10 @@ app.post("/stulog", function(req, res){
             if (foundUser) {
                 bcrypt.compare(password, foundUser.password, function(err, result) {
                     if (result === true) {
-                        res.redirect("/student");
+                        res.render("student",{
+                            name:foundUser.name,
+                            email:foundUser.email
+                        });
                     }else{
                         alert("Invalid username or password!!");      
                         res.redirect("/");
@@ -146,7 +231,11 @@ app.post("/tealog", function(req, res){
             if (foundUser) {
                 bcrypt.compare(password, foundUser.password, function(err, result) {
                     if (result === true) {
-                        res.redirect("/teacher");
+                        res.render("teacher",{
+                            name:foundUser.name,
+                            email:foundUser.email,
+                            classes:foundUser.classes
+                        });
                     }else{
                         alert("Invalid username or password!!");
                         res.redirect("/");

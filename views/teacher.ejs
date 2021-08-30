@@ -1,36 +1,52 @@
 <%- include('partials/header') %>
 
 <section id="stumain">
-    <div id="maincontainer">
+    <div id="maincontainer" class="d-flex justify-content-between">
         <h1 id="mainhead" class="p-3">Studylight</h1>
-        <div class="dropdown">
-            <button class="btn btn-outline-light m-3 dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-              Account
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-              <li><a class="dropdown-item" href="">Profile</a></li>
-              <li><a class="dropdown-item" href="/">Logout</a></li>
-            </ul>
-          </div>
+        <a href="/" class="btn btn-outline-light m-3">Logout</a>
     </div>
     <hr>
     <div class="row w-100">
         <div class="name-section col-lg-6">
             <h3 class="h3 sub-heading pb-2 wish">Welcome back</h3>
-            <h1 class="h1 main-heading pt-2">Charanraj</h1>
+            <h1 class="h1 main-heading pt-2"><%= name %></h1>
         </div>
         <div class="work-section col-lg-6">
-            <div class="row">
-                <div class="col-lg-6"><h3>
-                    <a href="" class="btn btn-outline-light btn-lg p-3 m-3"><i class="mx-2 fa-lg fas fa-calendar-alt"></i>Timetable</a>
-                </h3></div>
-                <div class="col-lg-6"><h3>
-                    <a href="" class="btn btn-outline-light btn-lg p-3 m-3"><i class="mx-2 fa-lg fas fa-plus-circle"></i>Create a class</a>
-                </h3></div>
-            </div>
+            <form id="teacherform" method="post">
+                <input type="hidden" name="name" value=<%= name %>>
+                <input type="hidden" name="email" value=<%= email %>>
+                <input type="hidden" name="classname" id="formclassname" value="">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <button type="button" onclick="formsubmit(this)" class="btn btn-outline-light btn-lg p-3 m-3" name="tt">
+                        <h3><i class="mx-2 fa-lg fas fa-calendar-alt"></i>Timetable</h3></button>
+                    </div>
+                    <div class="col-lg-6">
+                        <button type="button" data-bs-toggle="modal" href="#modal" class="btn btn-outline-light btn-lg p-3 m-3">
+                        <h3><i class="mx-2 fa-lg fas fa-plus-circle"></i>Create a class</h3></button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>    
 </section>
+
+<div class="modal" tabindex="-1" id="modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Enter name for your class</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <input type="text" name="name" class="form-control" id="classname">
+            <div class="text-center">
+                <button type="button" class="btn btn-primary text-center m-3" onclick="formsubmit(this)" name="cc">Create class</button>
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
 
 <section id="stubody">
     <div class="row w-100">
@@ -46,21 +62,36 @@
             </div>
         </div>
         <div class="col-lg-6">
-            <div class="row py-5">
-                <% for (var i =1; i <=21;  i++ ) { %>
-                    <div class="col-lg-4 text-center">
-                        <div class="classes card border-secondary mb-3">
-                            <div class="class-header p-3">
-                                <h3 class="card-title">Card title</h3>
-                            </div>
-                            <div class="card-body">
-                                <p class="card-text">Teacher name</p>
-                                <a href="" class="btn btn-outline-dark btn-sm">View class</a>
-                            </div>
-                        </div>             
+            <% if(classes.length ==0 )  {%>
+                <div class="card mx-auto text-center my-3 border-dark sticky-top" style="max-width: 18rem;">
+                    <div class="card-header text-white">    
+                      <h3 class="h3 card-title">No classes created</h3>
                     </div>
-                <% } %>
-            </div>
+                    <div class="card-body bg-light">
+                      <p class="card-text">Use create class option to create new classes</p>
+                    </div>
+                </div>
+            <% } else{ %>
+                <div class="row py-5">
+                    <% classes.forEach((c)=> { %>
+                        <div class="col-lg-4 text-center">
+                            <div class="classes card border-secondary mb-3">
+                                <div class="class-header p-3">
+                                    <h3 class="card-title"><%= c.name %></h3>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text"><%= c.teacher %></p>
+                                    <form action="/class" method="post">
+                                        <input type="hidden" name="code" value=<%= c.code %>>
+                                        <input type="hidden" name="email" value=<%= email %>>
+                                        <button type="submit" class="btn btn-outline-dark btn-sm">View class</button>
+                                    </form>
+                                </div>
+                            </div>             
+                        </div>
+                    <% }); %>
+                </div>
+            <% } %>
         </div>
         <div class="col-lg-3">
             <div class="card mx-auto text-center my-3 border-dark sticky-top" style="max-width: 18rem;">
@@ -86,6 +117,17 @@
     greeting = "Good evening";
     }
     document.getElementsByClassName("wish")[0].innerHTML = greeting;
+    var myform=document.getElementById("teacherform");
+    function formsubmit(btn){
+        if(btn.name=="tt"){
+            myform.action="/timetable";
+            myform.submit(); 
+        }else{
+            document.getElementById("formclassname").value=document.getElementById("classname").value;
+            myform.action="/createclass";
+            myform.submit();
+        }
+    }
 </script>
 
 <%- include('partials/footer') %>

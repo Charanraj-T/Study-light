@@ -81,7 +81,7 @@ footer .container-fluid{
     font-family: 'Montserrat', sans-serif;
 }
 
-                                        /* student homepage */
+                                        /* student,teacher homepage */
 
 #stumain{
     background-image: linear-gradient(to right, #5f0a87, #751c87, #872d87, #973e88, #a4508b);
@@ -117,10 +117,14 @@ hr{
     padding:3%;
 }
 
-.work-section a{
-    font-family: 'Roboto', sans-serif;
-    width:70%;
+.work-section button{
+    width:80%;
     text-align: left;
+}
+
+.work-section h3{
+    font-family: 'Roboto', sans-serif;
+    font-size: inherit;
 }
 
 #stubody .card-header{
@@ -143,10 +147,13 @@ hr{
     #c69deb, #bd96eb, #b391eb, #a88beb);
 }
 
-.dropdown{
-    float:right;
+                                        /* classes */
+
+.classcontainer{
+    padding:5% 10%;
 }
 
-.dropdown button{
-    background-color: #973e88;
+.classcontainer h2,.classcontainer h3,.classcontainer h4{
+    font-family: 'Roboto', sans-serif;
+    color:white;
 }

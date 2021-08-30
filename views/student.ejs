@@ -1,40 +1,34 @@
 <%- include('partials/header') %>
 
 <section id="stumain">
-    <div id="maincontainer">
+    <div id="maincontainer" class="d-flex justify-content-between">
         <h1 id="mainhead" class="p-3">Studylight</h1>
-        <div class="dropdown">
-            <button class="btn btn-outline-light m-3 dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-              Account
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-              <li><a class="dropdown-item" href="">Profile</a></li>
-              <li><a class="dropdown-item" href="/">Logout</a></li>
-            </ul>
-          </div>
+        <a href="/" class="btn btn-outline-light m-3">Logout</a>
     </div>
     <hr>
     <div class="row w-100">
         <div class="name-section col-lg-6">
             <h3 class="h3 sub-heading pb-2 wish">Welcome back</h3>
-            <h1 class="h1 main-heading pt-2">Charanraj</h1>
+            <h1 class="h1 main-heading pt-2"><%= name %></h1>
         </div>
         <div class="work-section col-lg-6">
-            <div class="row">
-                <div class="col-lg-6"><h3>
-                    <a href="" class="btn btn-outline-light btn-lg p-3 m-3"><i class="mx-2 fa-lg fas fa-clipboard-check"></i>Todo works</a>
-                </h3></div>
-                <div class="col-lg-6"><h3>
-                    <a href="" class="btn btn-outline-light btn-lg p-3 m-3"><i class="mx-2 fa-lg fas fa-calendar-alt"></i>Timetable</a>
-                </h3></div>
-                <div class="col-lg-6"><h3>
-                    <a href="" class="btn btn-outline-light btn-lg p-3 m-3"><i class="mx-2 fa-lg far fa-calendar"></i>Calender</a>
-                </h3></div>
-                <div class="col-lg-6"><h3>
-                    <a href="" class="btn btn-outline-light btn-lg p-3 m-3"><i class="mx-2 fa-lg fas fa-plus-circle"></i>Join a class</a>
-                </h3></div>
-            </div>
-        </div>
+            <form id="studentform" method="post">    
+                <div class="row">
+                    <div class="col-lg-6">
+                        <button type="submit" class="btn btn-outline-light btn-lg p-3 m-3">
+                        <h3><i class="mx-2 fa-lg fas fa-clipboard-check"></i>Todo works</h3></button>
+                    </div>
+                    <div class="col-lg-6">
+                        <button type="submit" class="btn btn-outline-light btn-lg p-3 m-3">
+                        <h3><i class="mx-2 fa-lg fas fa-plus-circle"></i>Join a class</h3></button>
+                    </div>
+                    <div class="col-lg-6">
+                        <button type="submit" class="btn btn-outline-light btn-lg p-3 m-3">
+                        <h3><i class="mx-2 fa-lg fas fa-calendar-alt"></i>Timetable</h3></button>
+                    </div>       
+                </div>
+            </form>       
+         </div>
     </div>    
 </section>
 
