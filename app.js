@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express=require("express");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
@@ -8,7 +9,7 @@ app.set("view engine","ejs");
 app.use(express.urlencoded({extended:true}));
 app.use(express.static("public"));
 
-mongoose.connect("mongodb://localhost:27017/studyDB", {useNewUrlParser: true});
+mongoose.connect("mongodb+srv://"+process.env.DB_USER+":"+process.env.DB_PASS+"@cluster0.hzq90.mongodb.net/studyDB", {useNewUrlParser: true});
  
 const classSchema = new mongoose.Schema ({
     name:String,
@@ -311,6 +312,6 @@ app.post("/tealog", function(req, res){
     });
 });
   
-app.listen(3000,()=>{
+app.listen(process.env.PORT || 3000,()=>{
     console.log("server is up and running");
 });
