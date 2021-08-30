@@ -14,7 +14,7 @@ const classSchema = new mongoose.Schema ({
     name:String,
     code:String,
     teacher: String,
-    student:[String]
+    students:[String]
 });
 
 const Class = new mongoose.model("Class", classSchema);
@@ -57,6 +57,20 @@ app.post("/home",(req,res)=>{
     });
 });
 
+app.post("/shome",(req,res)=>{
+    Student.findOne({email:req.body.email},(e,foundUser)=>{
+        if(e){
+            console.log(e);
+        }else{
+            res.render("student",{
+                name:foundUser.name,
+                email:foundUser.email,
+                classes:foundUser.classes
+            });
+        }
+    });
+});
+
 app.post("/class",(req,res)=>{
     Class.findOne({code:req.body.code},(e,foundClass)=>{
         if(e){
@@ -64,6 +78,20 @@ app.post("/class",(req,res)=>{
         }else{
             res.render("class",{
                 code:foundClass.code,
+                name:foundClass.teacher,
+                email:req.body.email,
+                classname:foundClass.name
+            });
+        }
+    });
+});
+
+app.post("/sclass",(req,res)=>{
+    Class.findOne({code:req.body.code},(e,foundClass)=>{
+        if(e){
+            console.log(e);
+        }else{
+            res.render("sclass",{
                 name:foundClass.teacher,
                 email:req.body.email,
                 classname:foundClass.name
@@ -115,6 +143,38 @@ app.post("/createclass",(req,res)=>{
     });
 });
 
+app.post("/joinclass",(req,res)=>{
+    Class.findOne({code:req.body.code},(e,foundClass)=>{
+        if(e){
+            console.log(e);
+        }else{
+            Student.findOne({email:req.body.email},(e,foundUser)=>{
+                if(e){
+                    console.log(e);
+                }else{
+                    if(foundUser.classes.some(e => e.code == req.body.code)){
+                        res.render("sclass",{
+                            email:foundUser.email,
+                            classname:foundClass.name,
+                            name:foundClass.teacher
+                        });
+                    }else{
+                        foundUser.classes.push(foundClass);
+                        foundUser.save();
+                        foundClass.students.push(foundUser._id);
+                        foundClass.save();
+                        res.render("sclass",{
+                            email:foundUser.email,
+                            classname:foundClass.name,
+                            name:foundClass.teacher
+                        });
+                    }
+                }
+            });
+        }
+    });
+});
+
 app.post("/stureg", function(req, res){
     const email=req.body.email;
     Student.findOne({email:email},(e,foundUser)=>{
@@ -142,7 +202,8 @@ app.post("/stureg", function(req, res){
                             } else {
                                 res.render("student",{
                                     name:req.body.name,
-                                    email: req.body.email
+                                    email: req.body.email,
+                                    classes:[]
                                 });
                             }
                         });
@@ -205,7 +266,8 @@ app.post("/stulog", function(req, res){
                     if (result === true) {
                         res.render("student",{
                             name:foundUser.name,
-                            email:foundUser.email
+                            email:foundUser.email,
+                            classes:foundUser.classes
                         });
                     }else{
                         alert("Invalid username or password!!");      

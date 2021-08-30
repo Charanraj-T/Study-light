@@ -1,0 +1,23 @@
+<%- include('partials/header') %>
+
+<section id="stumain">
+    <div id="maincontainer" class="d-flex justify-content-between">
+        <h1 id="mainhead" class="p-3">Studylight</h1>
+        <form action="/shome" method="POST">
+            <input type="hidden" name="email" value=<%= email %>>
+            <button type="submit" class="btn btn-outline-light m-3">Home</button>
+        </form>
+        <a href="/" class="btn btn-outline-light m-3">Logout</a>
+    </div>
+    <hr>
+    <div class="classcontainer">
+        <div class="row">
+            <div class="col-lg-6">
+                <h2 class="h2 p-2"><%= classname %></h2>
+                <h4 class="h4 p-2">Staff : <%= name %></h4>
+            </div>
+        </div>
+    </div>    
+</section>
+
+<%- include('partials/footer') %>
