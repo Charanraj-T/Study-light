@@ -157,3 +157,28 @@ hr{
     font-family: 'Roboto', sans-serif;
     color:white;
 }
+
+#classstream{
+    padding:2%;
+}
+
+#classstream .col-lg-3 .card-header{
+    background-color: #512D6D;
+}
+
+#streamTab .nav-link{
+    color: #2A0944;
+}
+
+#streamTab .nav-link:hover{
+    background-color: #a88beb;
+}
+
+#streamTab .active{
+    background-color: #c69deb;
+    font-weight: bolder;
+}
+
+#streamTabContent .tab-pane{
+    border: 1px solid#2A0944;
+}

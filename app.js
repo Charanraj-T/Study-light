@@ -10,12 +10,22 @@ app.use(express.urlencoded({extended:true}));
 app.use(express.static("public"));
 
 mongoose.connect("mongodb+srv://"+process.env.DB_USER+":"+process.env.DB_PASS+"@cluster0.hzq90.mongodb.net/studyDB", {useNewUrlParser: true});
- 
+
+const postSchema = new mongoose.Schema ({
+    author:String,
+    title:String,
+    description:String,
+    posttime:String
+});
+
+const Post =new mongoose.model("Post",postSchema);
+
 const classSchema = new mongoose.Schema ({
     name:String,
     code:String,
     teacher: String,
-    students:[String]
+    students:[String],
+    posts:[postSchema]
 });
 
 const Class = new mongoose.model("Class", classSchema);
@@ -42,6 +52,44 @@ const Teacher = new mongoose.model("Teacher", teacherSchema);
    
 app.get("/",(req,res)=>{
     res.render("home");
+});
+
+app.post("/cpost",(req,res)=>{
+    Class.findOne({code:req.body.code},(e,foundClass)=>{
+        if(e){
+            console.log(e);
+        }else{
+            const newPost =  new Post({
+                author:req.body.author,
+                title:req.body.title,
+                description:req.body.desc,
+                posttime: new Date().toString().slice(4,24)
+            });
+            newPost.save((e)=>{
+                if(e){
+                    console.log(e);
+                }else{
+                    foundClass.posts.push(newPost);
+                    foundClass.save((e)=>{
+                        Student.find().where('_id').in(foundClass.students).exec((err, records) => {
+                            if(err){
+                                console.log(err);
+                            }else{
+                                res.render("class",{
+                                    code:foundClass.code,
+                                    name:foundClass.teacher,
+                                    email:req.body.email,
+                                    classname:foundClass.name,
+                                    students:records,
+                                    posts:foundClass.posts
+                                });
+                            }
+                        });
+                    });
+                }
+            });
+        }
+    });
 });
 
 app.post("/home",(req,res)=>{
@@ -77,11 +125,19 @@ app.post("/class",(req,res)=>{
         if(e){
             console.log(e);
         }else{
-            res.render("class",{
-                code:foundClass.code,
-                name:foundClass.teacher,
-                email:req.body.email,
-                classname:foundClass.name
+            Student.find().where('_id').in(foundClass.students).exec((err, records) => {
+                if(err){
+                    console.log(err);
+                }else{
+                    res.render("class",{
+                        code:foundClass.code,
+                        name:foundClass.teacher,
+                        email:req.body.email,
+                        classname:foundClass.name,
+                        students:records,
+                        posts:foundClass.posts
+                    });
+                }
             });
         }
     });
@@ -133,7 +189,9 @@ app.post("/createclass",(req,res)=>{
                                     code:"sl"+String(count+1).padStart(4,'0'),
                                     name:req.body.name,
                                     classname:req.body.classname,
-                                    email:foundUser.email
+                                    email:foundUser.email,
+                                    students:[],
+                                    posts:[]
                                 });
                             }
                         }); 
@@ -150,26 +208,35 @@ app.post("/joinclass",(req,res)=>{
             console.log(e);
         }else{
             Student.findOne({email:req.body.email},(e,foundUser)=>{
-                if(e){
-                    console.log(e);
-                }else{
-                    if(foundUser.classes.some(e => e.code == req.body.code)){
-                        res.render("sclass",{
-                            email:foundUser.email,
-                            classname:foundClass.name,
-                            name:foundClass.teacher
-                        });
+                if(foundClass){
+                        if(e){
+                        console.log(e);
                     }else{
-                        foundUser.classes.push(foundClass);
-                        foundUser.save();
-                        foundClass.students.push(foundUser._id);
-                        foundClass.save();
-                        res.render("sclass",{
-                            email:foundUser.email,
-                            classname:foundClass.name,
-                            name:foundClass.teacher
-                        });
+                        if(foundUser.classes.some(e => e.code == req.body.code)){
+                            res.render("sclass",{
+                                email:foundUser.email,
+                                classname:foundClass.name,
+                                name:foundClass.teacher
+                            });
+                        }else{
+                            foundUser.classes.push(foundClass);
+                            foundUser.save();
+                            foundClass.students.push(foundUser._id);
+                            foundClass.save();
+                            res.render("sclass",{
+                                email:foundUser.email,
+                                classname:foundClass.name,
+                                name:foundClass.teacher
+                            });
+                        }
                     }
+                }else{
+                    alert("Class not found");
+                    res.render("student",{
+                        name:foundUser.name,
+                        email:foundUser.email,
+                        classes:foundUser.classes
+                    });
                 }
             });
         }
