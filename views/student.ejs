@@ -18,7 +18,7 @@
                 <input type="hidden" name="code" id="formclassname" value="">
                 <div class="row">
                     <div class="col-lg-6">
-                        <button type="button" onclick="formsubmit(this)" class="btn btn-outline-light btn-lg p-3 m-3" name="tw">
+                        <button disabled type="button" onclick="formsubmit(this)" class="btn btn-outline-light btn-lg p-3 m-3" name="tw">
                         <h3><i class="mx-2 fa-lg fas fa-clipboard-check"></i>Todo works</h3></button>
                     </div>
                     <div class="col-lg-6">
@@ -26,6 +26,7 @@
                         <h3><i class="mx-2 fa-lg fas fa-plus-circle"></i>Join a class</h3></button>
                     </div>
                     <div class="col-lg-6">
+                        <input type="hidden" name="type" id="type" value="student">
                         <button type="button" onclick="formsubmit(this)" class="btn btn-outline-light btn-lg p-3 m-3" name="tt">
                         <h3><i class="mx-2 fa-lg fas fa-calendar-alt"></i>Timetable</h3></button>
                     </div>       

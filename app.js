@@ -35,7 +35,8 @@ const studentSchema = new mongoose.Schema ({
     email: String,
     password: String,
     phone:Number,
-    classes:[classSchema]
+    classes:[classSchema],
+    periods:[[String]]
 });
     
 const Student = new mongoose.model("Student", studentSchema);
@@ -45,13 +46,111 @@ const teacherSchema = new mongoose.Schema ({
     email: String,
     password: String,
     phone:Number,
-    classes:[classSchema]
+    classes:[classSchema],
+    periods:[[String]]
 });
     
 const Teacher = new mongoose.model("Teacher", teacherSchema);
    
 app.get("/",(req,res)=>{
     res.render("home");
+});
+
+app.post("/timetable",(req,res)=>{
+    const ptype=req.body.type;
+    if(ptype=="student"){
+        Student.findOne({email:req.body.email},function(e,foundUser){
+            if(e){
+                console.log(e);
+            }else{
+                res.render("table",{
+                    email:req.body.email,
+                    type:ptype,
+                    periods:foundUser.periods
+                });
+            }
+        });
+    }else{
+        Teacher.findOne({email:req.body.email},function(e,foundUser){
+            if(e){
+                console.log(e);
+            }else{
+                res.render("table",{
+                    email:req.body.email,
+                    type:ptype,
+                    periods:foundUser.periods
+                });
+            }
+        });
+    }
+});
+
+app.post("/tableupdate",(req,res)=>{
+    const ptype=req.body.type;
+    var periods=[["Monday"],["Tuesday"],["Wednesday"],["Thursday"],["Friday"]]
+    for(var i=0,k=0;i<5;i++){
+        for(var j=0;j<5;j++,k++){
+            periods[i].push(req.body[k]);
+        }  
+    }
+    if(ptype=="student"){
+        Student.findOne({email:req.body.email},function(e,foundUser){
+            if(e){
+                console.log(e);
+            }else{
+                foundUser.periods=periods;
+                foundUser.save();
+                res.render("table",{
+                    email:req.body.email,
+                    type:ptype,
+                    periods:foundUser.periods
+                });
+            }
+        });
+    }else{
+        Teacher.findOne({email:req.body.email},function(e,foundUser){
+            if(e){
+                console.log(e);
+            }else{
+                foundUser.periods=periods;
+                foundUser.save();
+                res.render("table",{
+                    email:req.body.email,
+                    type:ptype,
+                    periods:foundUser.periods
+                });
+            }
+        });
+    }
+});
+
+app.post("/tablehome",(req,res)=>{
+    const ptype=req.body.type;
+    if(ptype=="student"){
+        Student.findOne({email:req.body.email},function(e,foundUser){
+            if(e){
+                console.log(e);
+            }else{
+                res.render("student",{
+                    name:foundUser.name,
+                    email:foundUser.email,
+                    classes:foundUser.classes
+                });        
+            }
+        });
+    }else{
+        Teacher.findOne({email:req.body.email},function(e,foundUser){
+            if(e){
+                console.log(e);
+            }else{
+                res.render("teacher",{
+                    name:foundUser.name,
+                    email:foundUser.email,
+                    classes:foundUser.classes
+                });        
+            }
+        });
+    }
 });
 
 app.post("/cpost",(req,res)=>{
@@ -332,7 +431,14 @@ app.post("/stureg", function(req, res){
                             email: req.body.email,
                             name:req.body.name,
                             phone:req.body.phone,
-                            password: hash
+                            password: hash,
+                            periods:[
+                                ["Monday","N/A","N/A","N/A","N/A","N/A"],
+                                ["Tuesday","N/A","N/A","N/A","N/A","N/A"],
+                                ["wednesday","N/A","N/A","N/A","N/A","N/A"],
+                                ["Thursday","N/A","N/A","N/A","N/A","N/A"],
+                                ["Friday","N/A","N/A","N/A","N/A","N/A"]
+                            ]
                         });
                         
                         newStudent.save(function(err){
@@ -371,7 +477,14 @@ app.post("/teareg", function(req, res){
                             email: req.body.email,
                             name:req.body.name,
                             phone:req.body.phone,
-                            password: hash
+                            password: hash,
+                            periods:[
+                                ["Monday","N/A","N/A","N/A","N/A","N/A"],
+                                ["Tuesday","N/A","N/A","N/A","N/A","N/A"],
+                                ["wednesday","N/A","N/A","N/A","N/A","N/A"],
+                                ["Thursday","N/A","N/A","N/A","N/A","N/A"],
+                                ["Friday","N/A","N/A","N/A","N/A","N/A"]
+                            ]
                         });
                         
                         newTeacher.save(function(err){

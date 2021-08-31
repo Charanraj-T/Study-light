@@ -1,0 +1,82 @@
+<%- include('partials/header') %>
+
+<section id="stumain">
+    <div id="maincontainer">
+      <div class="row">
+        <div class="col-lg-6">
+          <h1 id="mainhead" class="p-3">Studylight</h1>
+        </div>
+        <div class="col-lg-6">
+          <div class="d-flex justify-content-between">
+            <form action="/tablehome" method="POST">
+              <input type="hidden" name="email" value=<%= email %>>
+              <input type="hidden" name="type" value=<%= type %>>
+              <button type="submit" class="btn btn-outline-light m-3">Home</button>
+            </form>
+            <a href="/" class="btn btn-outline-light m-3">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>
+
+<div class="table-responsive">
+    <table class="table table-bordered">
+        <thead class="bg-light">
+          <tr class="tabletitle">
+            <th class="p-3" scope="col"></th>
+            <th class="p-3" scope="col">1st hour</th>
+            <th class="p-3" scope="col">2nd hour</th>
+            <th class="p-3" scope="col">3rd hour</th>
+            <th class="p-3" scope="col">4th hour</th>
+            <th class="p-3" scope="col">5th hour</th>
+          </tr>
+        </thead>
+        <tbody>
+            <% for(var i=0;i < 5;i++){ %>
+              <tr>
+                <% for(var j=0;j < 6;j++){ %>
+                  <td><%= periods[i][j] %></td>
+                <%}%>    
+              </tr>
+            <%}%>
+        </tbody>
+    </table>
+</div>
+
+<div class="text-center">
+    <button type="button" class="btn btn-lg btn-outline-primary"  data-bs-toggle="modal" href="#modal">Update values</button>
+</div>
+
+<div class="modal fade" id="modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Time table Update</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="/tableupdate">
+        <div class="modal-body">
+          <input type="hidden" name="email" value=<%= email %>>
+          <input type="hidden" name="type" value=<%= type %>>
+          <% for(var i=0,k=0;i < 5;i++){%>
+            <div class="mb-3">
+              <h5 class="h5"><%= periods[i][0] %></h5>
+            </div>
+            <div class="d-flex justify-contents-center mb-3">
+              <% for(var j=1;j < 6;j++,k++) {%>
+                  <input type="text" class="form-control" id="<%=k%>" name="<%=k%>" value="<%= periods[i][j] %>" placeholder="<%= periods[i][j] %>">
+              <%}%>
+            </div>
+          <% } %>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Update values</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>
