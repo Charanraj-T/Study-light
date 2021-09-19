@@ -2,7 +2,6 @@ require('dotenv').config();
 const express=require("express");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
-const alert=require("alert");
 const app=express();
 
 app.set("view engine","ejs");
@@ -53,7 +52,10 @@ const teacherSchema = new mongoose.Schema ({
 const Teacher = new mongoose.model("Teacher", teacherSchema);
    
 app.get("/",(req,res)=>{
-    res.render("home");
+    res.render("home",{
+        regerror:"",
+        logerror:""
+    });
 });
 
 app.post("/timetable",(req,res)=>{
@@ -134,7 +136,8 @@ app.post("/tablehome",(req,res)=>{
                 res.render("student",{
                     name:foundUser.name,
                     email:foundUser.email,
-                    classes:foundUser.classes
+                    classes:foundUser.classes,
+                    error:""
                 });        
             }
         });
@@ -146,7 +149,8 @@ app.post("/tablehome",(req,res)=>{
                 res.render("teacher",{
                     name:foundUser.name,
                     email:foundUser.email,
-                    classes:foundUser.classes
+                    classes:foundUser.classes,
+                    error:""
                 });        
             }
         });
@@ -243,7 +247,8 @@ app.post("/home",(req,res)=>{
             res.render("teacher",{
                 name:foundUser.name,
                 email:foundUser.email,
-                classes:foundUser.classes
+                classes:foundUser.classes,
+                error:""
             });
         }
     });
@@ -257,7 +262,8 @@ app.post("/shome",(req,res)=>{
             res.render("student",{
                 name:foundUser.name,
                 email:foundUser.email,
-                classes:foundUser.classes
+                classes:foundUser.classes,
+                error:""
             });
         }
     });
@@ -319,17 +325,17 @@ app.post("/createclass",(req,res)=>{
                     console.log(e);
                 }else{
                     if(foundUser.classes.some(e => e.name == req.body.classname)){
-                        alert("classroom exists already");
                         res.render("teacher",{
                             name:req.body.name,
                             email: req.body.email,
-                            classes:foundUser.classes
+                            classes:foundUser.classes,
+                            error:"Classroom exists already!!"
                         });
                     }else{
                         const newClass =  new Class({
                             teacher:req.body.name,
                             name:req.body.classname,
-                            code:"sl"+String(count+1).padStart(4,'0')
+                            code:"SL"+String(count+1).padStart(4,'0')
                         });
                         foundUser.classes.push(newClass);
                         foundUser.save();
@@ -401,11 +407,11 @@ app.post("/joinclass",(req,res)=>{
                         }
                     }
                 }else{
-                    alert("Class not found");
                     res.render("student",{
                         name:foundUser.name,
                         email:foundUser.email,
-                        classes:foundUser.classes
+                        classes:foundUser.classes,
+                        error:"Class not found!!"
                     });
                 }
             });
@@ -420,8 +426,10 @@ app.post("/stureg", function(req, res){
             console.log(e);
         }else{
             if(foundUser){
-                alert("User already registered");
-                res.redirect("/");
+                res.render("home",{
+                    regerror:"User already registered!!",
+                    logerror:""
+                });
             }else{
                 bcrypt.hash(req.body.password, 10, function(e, hash) {
                     if(e){
@@ -448,7 +456,8 @@ app.post("/stureg", function(req, res){
                                 res.render("student",{
                                     name:req.body.name,
                                     email: req.body.email,
-                                    classes:[]
+                                    classes:[],
+                                    error:""
                                 });
                             }
                         });
@@ -466,8 +475,10 @@ app.post("/teareg", function(req, res){
             console.log(e);
         }else{
             if(foundUser){
-                alert("User already registered");
-                res.redirect("/");
+                res.render("home",{
+                    regerror:"User already registered!!",
+                    logerror:""
+                });
             }else{
                 bcrypt.hash(req.body.password, 10, function(e, hash) {
                     if(e){
@@ -494,7 +505,8 @@ app.post("/teareg", function(req, res){
                                 res.render("teacher",{
                                     name:req.body.name,
                                     email: req.body.email,
-                                    classes:[]
+                                    classes:[],
+                                    error:""
                                 });
                             }
                         });
@@ -519,16 +531,21 @@ app.post("/stulog", function(req, res){
                         res.render("student",{
                             name:foundUser.name,
                             email:foundUser.email,
-                            classes:foundUser.classes
+                            classes:foundUser.classes,
+                            error:""
                         });
                     }else{
-                        alert("Invalid username or password!!");      
-                        res.redirect("/");
+                        res.render("home",{
+                            regerror:"",
+                            logerror:"Invalid username or password!!"
+                        });
                     }
                 });
             }else{
-                alert("Invalid username or password!!");
-                res.redirect("/");
+                res.render("home",{
+                    regerror:"",
+                    logerror:"Invalid username or password!!"
+                });
             }
         }
     });
@@ -548,16 +565,21 @@ app.post("/tealog", function(req, res){
                         res.render("teacher",{
                             name:foundUser.name,
                             email:foundUser.email,
-                            classes:foundUser.classes
+                            classes:foundUser.classes,
+                            error:""
                         });
                     }else{
-                        alert("Invalid username or password!!");
-                        res.redirect("/");
+                        res.render("home",{
+                            regerror:"",
+                            logerror:"Invalid username or password!!"
+                        });
                     }
                 });
             }else{
-                alert("Invalid username or password!!");
-                res.redirect("/");
+                res.render("home",{
+                    regerror:"",
+                    logerror:"Invalid username or password!!"
+                });
             }
         }
     });
