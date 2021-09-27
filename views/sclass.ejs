@@ -87,6 +87,13 @@
                               <div class="card-body text-dark">
                                 <p class="card-title"><%= posts[i].title %></p>
                                 <p class="card-text"><%= posts[i].description %></p>
+                                <div class="row">
+                                  <% posts[i].files.forEach((f)=>{ %>
+                                    <div class="col-lg-4 col-md-6">
+                                      <a href="/<%= f %>" class="btn postfile" target="_blank"><%= f.slice(14) %></a>
+                                    </div>
+                                  <% }); %>
+                                </div>
                               </div>
                           </div>
                       <%}%>
@@ -132,17 +139,21 @@
           <h5 class="modal-title" id="exampleModalLabel">New post</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <form method="POST" action="/scpost">
+        <form method="POST" action="/scpost" enctype="multipart/form-data">
           <div class="modal-body">
             <input type="hidden" name="code" value=<%= code %>>
             <input type="hidden" name="email" value=<%= email %>>
             <div class="mb-3">
               <label for="title" class="col-form-label">Title:</label>
-              <input type="text" class="form-control" id="title" name="title">
+              <input type="text" class="form-control" id="title" name="title" required>
             </div>
             <div class="mb-3">
               <label for="desc" class="col-form-label">Message:</label>
-              <textarea class="form-control" id="desc" name="desc"></textarea>
+              <textarea class="form-control" id="desc" name="desc" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="files" class="col-form-label">Files:</label>
+              <input type="file" class="form-control" id="files" name="files" multiple>
             </div>
           </div>
           <div class="modal-footer">

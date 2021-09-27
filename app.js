@@ -2,6 +2,9 @@ require('dotenv').config();
 const express=require("express");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const multer = require('multer');
+const {GridFsStorage} = require('multer-gridfs-storage');
+const path = require("path");
 const app=express();
 
 app.set("view engine","ejs");
@@ -10,11 +13,30 @@ app.use(express.static("public"));
 
 mongoose.connect("mongodb+srv://"+process.env.DB_USER+":"+process.env.DB_PASS+"@cluster0.hzq90.mongodb.net/studyDB", {useNewUrlParser: true});
 
+let gfs;
+mongoose.connection.once('open',()=>{
+  gfs= new mongoose.mongo.GridFSBucket(mongoose.connection.db,{
+    bucketName:'fs'
+  });
+});
+
+const storage = new GridFsStorage({
+    url: "mongodb+srv://"+process.env.DB_USER+":"+process.env.DB_PASS+"@cluster0.hzq90.mongodb.net/studyDB",
+    file: (req, file) => {
+      return {
+        filename: Date.now()+"-"+file.originalname
+      };
+    }
+});
+
+const upload = multer({storage});  
+
 const postSchema = new mongoose.Schema ({
     author:String,
     title:String,
     description:String,
-    posttime:String
+    posttime:String,
+    files:[String]
 });
 
 const Post =new mongoose.model("Post",postSchema);
@@ -55,6 +77,21 @@ app.get("/",(req,res)=>{
     res.render("home",{
         regerror:"",
         logerror:""
+    });
+});
+
+app.get('/:filename', (req, res) => {
+    const file = gfs
+      .find({
+        filename: req.params.filename,
+      })
+      .toArray((err, files) => {
+        if (!files || files.length === 0) {
+          return res.status(404).json({
+            err: 'no files exist',
+          });
+        }
+        gfs.openDownloadStreamByName(req.params.filename).pipe(res);
     });
 });
 
@@ -157,7 +194,7 @@ app.post("/tablehome",(req,res)=>{
     }
 });
 
-app.post("/cpost",(req,res)=>{
+app.post("/cpost",upload.array('files'),(req,res)=>{
     Class.findOne({code:req.body.code},(e,foundClass)=>{
         if(e){
             console.log(e);
@@ -168,6 +205,9 @@ app.post("/cpost",(req,res)=>{
                 description:req.body.desc,
                 posttime: new Date().toString().slice(4,24)
             });
+            if(req.files){
+                newPost.files=req.files.map(a=>a.filename);
+            }
             newPost.save((e)=>{
                 if(e){
                     console.log(e);
@@ -195,7 +235,7 @@ app.post("/cpost",(req,res)=>{
     });
 });
 
-app.post("/scpost",(req,res)=>{
+app.post("/scpost",upload.array('files'),(req,res)=>{
     Class.findOne({code:req.body.code},(e,foundClass)=>{
         if(e){
             console.log(e);
@@ -210,6 +250,9 @@ app.post("/scpost",(req,res)=>{
                         description:req.body.desc,
                         posttime: new Date().toString().slice(4,24)
                     });
+                    if(req.files){
+                        newPost.files=req.files.map(a=>a.filename);
+                    }
                     newPost.save((e)=>{
                         if(e){
                             console.log(e);
@@ -344,7 +387,7 @@ app.post("/createclass",(req,res)=>{
                                 console.log(err);
                             } else {
                                 res.render("class",{
-                                    code:"sl"+String(count+1).padStart(4,'0'),
+                                    code:"SL"+String(count+1).padStart(4,'0'),
                                     name:req.body.name,
                                     classname:req.body.classname,
                                     email:foundUser.email,

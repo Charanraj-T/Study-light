@@ -183,6 +183,19 @@ hr{
     border: 1px solid#2A0944;
 }
 
+.postfile{
+    text-decoration: none;
+    width:100%;
+    margin:5px;
+    border: 1px solid #5f0a87;
+}
+
+.postfile:hover{
+    color:white;
+    background-color: #751c87;
+    box-shadow: 2px 2px 2px 2px #a88beb;
+}
+
                                         /* timetable */
 
 .table-responsive{
