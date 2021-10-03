@@ -1,0 +1,123 @@
+<%- include('partials/header') %>
+
+<section id="stumain">
+    <div id="maincontainer">
+      <div class="row">
+        <div class="col-lg-6">
+          <h1 id="mainhead" class="p-3">Studylight</h1>
+        </div>
+        <div class="col-lg-6">
+          <div class="d-flex justify-content-between">
+            <form action="/class" method="POST">
+              <input type="hidden" name="code" value=<%= code %>>
+              <input type="hidden" name="email" value=<%= email %>>
+              <button type="submit" class="btn btn-outline-light m-3">Back to class</button>
+            </form>
+            <a href="/" class="btn btn-outline-light m-3">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>
+
+<section id="assignmain">
+  <div class="d-flex justify-content-between">
+    <p class="fw-bold fs-5">Due: <%= assign.duetime %></p>
+    <p class="fw-bold fs-5">Marks: <%= assign.maxmarks %></p>  
+  </div>
+  <br>
+  <div class="container" id="qnside">
+    <div class="row">
+      <div class="col-lg-9">
+        <h1><%= assign.title %></h1>
+        <hr>
+        <p><%= assign.description %></p>    
+      </div>
+      <div class="col-lg-3">
+        <button data-bs-toggle="modal" data-bs-target="#viewmodal" type="submit" name="viewl" id="viewl" class="btn mybtn shadow-none p-2 m-2 w-100">View submissions</button>
+        <% if(assign.status=="live"){ %>
+          <form action="/endassign" method="post">
+            <input type="hidden" name="code" value=<%= code %>>
+            <input type="hidden" name="email" value=<%= email %>>
+            <input type="hidden" name="_id" value="<%= assign._id %>">
+            <button class="btn mybtn shadow-none p-2 m-2 w-100">End the assignment</button>
+          </form>
+        <%}else{%>
+          <button disabled class="btn mybtn p-2 m-2 w-100">Assignment ended</button>
+        <% } %>
+      </div>
+    </div>
+    <br>
+    <div class="row">
+      <% assign.files.forEach(file=>{ %>
+        <div class="col-lg-3 col-md-6">
+          <div class="card m-2" style="max-width: 540px;">
+            <div class="row g-0 text-white">
+              <div class="col-md-3">
+                <i class="fas fa-file fa-4x p-3"></i>
+              </div>
+              <div class="col-md-9">
+                <div class="card-body">
+                  <p class="card-title"><%= file.slice(14) %></p>
+                  <a class="btn btn-outline-light btn-sm" href="/<%= file %>" target="_blank">View file</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  </div>
+</section>
+ 
+<div class="modal fade" id="viewmodal" tabindex="-1" aria-labelledby="viewl" aria-hidden="true">
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title h2">Submissions</h2>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="/assignmarkupdate">
+        <div class="modal-body">
+          <input type="hidden" name="code" value=<%= code %>>
+          <input type="hidden" name="email" value=<%= email %>>
+          <input type="hidden" name="_id" value="<%= assign._id %>">
+          <table class="table table-hover table-bordered">
+            <thead>
+              <tr>
+                <th scope="col">Student name</th>
+                <th scope="col">Files</th>
+                <th scope="col">Marks</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% for(i=0;i < assign.marks.length;i++){ %>
+                <tr>
+                  <td><%= assign.marks[i].name %></td>
+                  <% if(assign.marks[i].isSub==false){ %>
+                    <td>No files submitted</td>
+                  <% }else{ %>
+                    <td>
+                      <li>
+                        <% assign.marks[i].files.forEach(f => { %>
+                          <ol><a href="/<f>">f</a></ol>
+                        <% }); %>
+                      </li>
+                    </td>
+                  <% } %>
+                  <td><input type="number" min="0" max="<%= assign.maxmarks %>" class="form-control" id="<%=i%>" name="<%=i%>" value="<%= assign.marks[i].mark %>" placeholder="<%= assign.marks[i].mark %>"></td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn ms-auto btn-secondary btn-outline-light" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn me-auto mybtn shadow-none">Update marks</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

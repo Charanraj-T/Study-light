@@ -41,12 +41,50 @@ const postSchema = new mongoose.Schema ({
 
 const Post =new mongoose.model("Post",postSchema);
 
+const testSchema = new mongoose.Schema ({
+    title:String,
+    description:String,
+    duetime:String,
+    maxmarks:Number,
+    status:String,
+    marks:[{
+        name:String,
+        id:String,
+        mark:Number,
+        files:[],
+        isSub:Boolean
+    }],
+    files:[String]
+});
+
+const Test =new mongoose.model("Test",testSchema);
+
+const assignSchema = new mongoose.Schema ({
+    title:String,
+    description:String,
+    duetime:String,
+    maxmarks:Number,
+    status:String,
+    marks:[{
+        name:String,
+        id:String,
+        mark:Number,
+        files:[],
+        isSub:Boolean
+    }],
+    files:[String]
+});
+
+const Assign =new mongoose.model("Assign",assignSchema);
+
 const classSchema = new mongoose.Schema ({
     name:String,
     code:String,
     teacher: String,
     students:[String],
-    posts:[postSchema]
+    posts:[postSchema],
+    tests:[testSchema],
+    assign:[assignSchema]
 });
 
 const Class = new mongoose.model("Class", classSchema);
@@ -73,6 +111,33 @@ const teacherSchema = new mongoose.Schema ({
     
 const Teacher = new mongoose.model("Teacher", teacherSchema);
    
+function checkdue(){
+    Test.find({},(e,foundtests)=>{
+        if(e){
+            console.log(e);
+        }else{
+            foundtests.forEach(test=>{
+                if(new Date(test.duetime)<new Date()){
+                    test.status="ended";
+                    test.save();
+                }
+            });
+        } 
+    });
+    Assign.find({},(e,foundassign)=>{
+        if(e){
+            console.log(e);
+        }else{
+            foundassign.forEach(a=>{
+                if(new Date(a.duetime)<new Date()){
+                    a.status="ended";
+                    a.save();
+                }
+            });
+        } 
+    });
+}
+
 app.get("/",(req,res)=>{
     res.render("home",{
         regerror:"",
@@ -92,6 +157,206 @@ app.get('/:filename', (req, res) => {
           });
         }
         gfs.openDownloadStreamByName(req.params.filename).pipe(res);
+    });
+});
+
+app.post("/test",upload.array('files'),(req,res)=>{
+    Class.findOne({code:req.body.code},(e,foundClass)=>{
+        if(e){
+            console.log(e);
+        }else{
+            const newtest =  new Test({
+                title:req.body.title,
+                description:req.body.desc,
+                duetime: new Date(req.body.due).toLocaleDateString()+" "+new Date(req.body.due).toLocaleTimeString(),   
+                maxmarks:req.body.mmark,
+                status:"live"
+            });
+            Student.find().where('_id').in(foundClass.students).exec((err, records) => {
+                if(err){
+                    console.log(err);
+                }else{
+                    records.forEach(record=>{
+                        let d={
+                            name:record.name,
+                            mark:0,
+                            id:record._id,
+                            isSub:false
+                        };
+                        newtest.marks.push(d);
+                        if(req.files){
+                            newtest.files=req.files.map(a=>a.filename);
+                        }
+                        newtest.save((e)=>{
+                            if(e){
+                                console.log(e);
+                            }else{
+                                foundClass.tests.push(newtest);
+                                foundClass.save((e)=>{
+                                    checkdue();
+                                    res.render("class",{
+                                        code:foundClass.code,
+                                        name:foundClass.teacher,
+                                        email:req.body.email,
+                                        classname:foundClass.name,
+                                        students:records,
+                                        posts:foundClass.posts,
+                                        tests:foundClass.tests,
+                                        assign:foundClass.assign
+                                    });
+                                });
+                            }
+                        });
+                    });
+                }
+            });   
+        }
+    });
+});
+
+app.post("/testpage",(req,res)=>{
+    Test.findOne({_id:req.body._id},function(e,foundTest){
+        if(e){
+            console.log(e);
+        }else{
+            res.render("test",{
+                code:req.body.code,
+                email:req.body.email,
+                test:foundTest
+            });
+        }
+    });
+});
+
+app.post("/endtest",(req,res)=>{
+    Test.findOneAndUpdate({_id:req.body._id}, {$set:{status:"ended"}},{new: true},(e, foundTest)=>{
+        if(e){
+            console.log(e);
+        }else{
+            res.render("test",{
+                code:req.body.code,
+                email:req.body.email,
+                test:foundTest
+            });
+        }
+    });
+});
+
+app.post("/markupdate",(req,res)=>{
+    Test.findOne({_id:req.body._id},function(e,foundTest){
+        if(e){
+            console.log(e);
+        }else{
+            for(i=0;i<foundTest.marks.length;i++)
+            foundTest.marks[i].mark=req.body[i];
+            foundTest.save((e)=>{
+                res.render("test",{
+                    code:req.body.code,
+                    email:req.body.email,
+                    test:foundTest
+                });
+            });
+        }
+    });
+});
+
+app.post("/assign",upload.array('files'),(req,res)=>{
+    Class.findOne({code:req.body.code},(e,foundClass)=>{
+        if(e){
+            console.log(e);
+        }else{
+            const newassign =  new Assign({
+                title:req.body.title,
+                description:req.body.desc,
+                duetime: new Date(req.body.due).toLocaleDateString()+" "+new Date(req.body.due).toLocaleTimeString(),   
+                maxmarks:req.body.mmark,
+                status:"live"
+            });
+            Student.find().where('_id').in(foundClass.students).exec((err, records) => {
+                if(err){
+                    console.log(err);
+                }else{
+                    records.forEach(record=>{
+                        let d={
+                            name:record.name,
+                            mark:0,
+                            id:record._id,
+                            isSub:false
+                        };
+                        newassign.marks.push(d);
+                        if(req.files){
+                            newassign.files=req.files.map(a=>a.filename);
+                        }
+                        newassign.save((e)=>{
+                            if(e){
+                                console.log(e);
+                            }else{
+                                foundClass.assign.push(newassign);
+                                foundClass.save((e)=>{
+                                    checkdue();
+                                    res.render("class",{
+                                        code:foundClass.code,
+                                        name:foundClass.teacher,
+                                        email:req.body.email,
+                                        classname:foundClass.name,
+                                        students:records,
+                                        posts:foundClass.posts,
+                                        tests:foundClass.tests,
+                                        assign:foundClass.assign
+                                    });
+                                });
+                            }
+                        });
+                    });
+                }
+            });   
+        }
+    });
+});
+
+app.post("/assignpage",(req,res)=>{
+    Assign.findOne({_id:req.body._id},function(e,founda){
+        if(e){
+            console.log(e);
+        }else{
+            res.render("assign",{
+                code:req.body.code,
+                email:req.body.email,
+                assign:founda
+            });
+        }
+    });
+});
+
+app.post("/endassign",(req,res)=>{
+    Assign.findOneAndUpdate({_id:req.body._id}, {$set:{status:"ended"}},{new: true},(e, founda)=>{
+        if(e){
+            console.log(e);
+        }else{
+            res.render("assign",{
+                code:req.body.code,
+                email:req.body.email,
+                assign:founda
+            });
+        }
+    });
+});
+
+app.post("/assignmarkupdate",(req,res)=>{
+    Assign.findOne({_id:req.body._id},function(e,founda){
+        if(e){
+            console.log(e);
+        }else{
+            for(i=0;i<founda.marks.length;i++)
+            founda.marks[i].mark=req.body[i];
+            founda.save((e)=>{
+                res.render("assign",{
+                    code:req.body.code,
+                    email:req.body.email,
+                    assign:founda
+                });
+            });
+        }
     });
 });
 
@@ -218,13 +483,16 @@ app.post("/cpost",upload.array('files'),(req,res)=>{
                             if(err){
                                 console.log(err);
                             }else{
+                                checkdue();
                                 res.render("class",{
                                     code:foundClass.code,
                                     name:foundClass.teacher,
                                     email:req.body.email,
                                     classname:foundClass.name,
                                     students:records,
-                                    posts:foundClass.posts
+                                    posts:foundClass.posts,
+                                    tests:foundClass.tests,
+                                    assign:foundClass.assign
                                 });
                             }
                         });
@@ -321,13 +589,16 @@ app.post("/class",(req,res)=>{
                 if(err){
                     console.log(err);
                 }else{
+                    checkdue();
                     res.render("class",{
                         code:foundClass.code,
                         name:foundClass.teacher,
                         email:req.body.email,
                         classname:foundClass.name,
                         students:records,
-                        posts:foundClass.posts
+                        posts:foundClass.posts,
+                        tests:foundClass.tests,
+                        assign:foundClass.assign
                     });
                 }
             });
@@ -386,13 +657,16 @@ app.post("/createclass",(req,res)=>{
                             if (err) {
                                 console.log(err);
                             } else {
+                                checkdue();
                                 res.render("class",{
                                     code:"SL"+String(count+1).padStart(4,'0'),
                                     name:req.body.name,
                                     classname:req.body.classname,
                                     email:foundUser.email,
                                     students:[],
-                                    posts:[]
+                                    posts:[],
+                                    tests:[],
+                                    assign:[]
                                 });
                             }
                         }); 

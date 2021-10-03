@@ -12,6 +12,15 @@ h1,h2,h3,h4,h5,h6{
     padding:7% 15%;
 }
 
+.mybtn{
+    border-color: #512D6D;
+}
+
+.mybtn:hover{
+    background-color: #5f0a87;
+    color:white;
+}
+
                                         /* home.ejs */
 
 /* home */
@@ -200,4 +209,37 @@ hr{
 
 .table-responsive{
     padding:3% 5%;
+}
+
+                                        /* testpage */
+
+#testmain h1,#assignmain h1{
+    font-family: 'Roboto', sans-serif;
+    color: #2A0944;
+}                                    
+
+#testmain .d-flex,#assignmain .d-flex{
+    width:80%;
+    padding:2% 2% 0;
+    margin:0 auto;
+}
+
+#qnside .card{
+    background-color: purple;
+}
+
+#qnside hr{
+    background-color: purple;
+    height: 3px;
+    width: 100%;
+    margin:10px auto 20px;
+}
+
+#qnside .card-title{
+    font-weight:bolder;
+    padding-bottom: 5px;
+}
+
+#qnside p{
+    word-wrap: break-word;
 }

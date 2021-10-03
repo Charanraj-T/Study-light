@@ -44,22 +44,58 @@
         <div class="col-lg-3 px-3">
             <div class="card mx-auto text-center my-3 border-dark" style="max-width: 18rem;">
                 <div class="card-header text-white">    
-                  <h3 class="h3 card-title">Tests pending</h3>
+                  <h3 class="h3 card-title">Tests posted</h3>
                 </div>
                 <div class="card-body bg-light">
-                  <i class="fas fa-3x p-3 fa-check-circle"></i>
-                  <p class="card-text">All tests ended</p>
+                  <% var ptest=tests.filter(test=>(test.status=="live"))%>
+                  <% if (ptest.length!=0) { %>
+                    <ul class="list-group">
+                      <% var l= ptest.length < 5 ? ptest.length : 5%>
+                      <% for(i=0;i < l;i++){ %>
+                        <li class="list-group-item">
+                          <form action="/testpage" method="post">
+                            <input type="hidden" name="code" value=<%= code %>>
+                            <input type="hidden" name="_id" value=<%= ptest[i]._id %>>
+                            <input type="hidden" name="email" value=<%= email %>>
+                            <button type="submit" class="btn w-100"><%= ptest[i].title %></button>
+                          </form>
+                        </li>
+                      <% } %>
+                    </ul>
+                    <button class="btn mybtn shadow-none w-100 mt-2" onclick="testpage()";>View all tests</button>
+                  <% }else{ %>
+                    <i class="fas fa-3x p-3 fa-check-circle"></i>
+                    <p class="card-text">All tests ended</p>
+                  <% } %>  
                 </div>
             </div>
             <div class="card mx-auto text-center my-3 border-dark" style="max-width: 18rem;">
-                <div class="card-header text-white">   
-                  <h3 class="h3 card-title">Assignments</h3>
-                </div>
-                <div class="card-body bg-light">
+              <div class="card-header text-white">    
+                <h3 class="h3 card-title">Assigments posted</h3>
+              </div>
+              <div class="card-body bg-light">
+                <% var passign=assign.filter(a=>(a.status=="live"))%>
+                <% if (passign.length!=0) { %>
+                  <ul class="list-group">
+                    <% var l= passign.length < 5 ? passign.length : 5%>
+                    <% for(i=0;i < l;i++){ %>
+                      <li class="list-group-item">
+                        <form action="/assignpage" method="post">
+                          <input type="hidden" name="code" value=<%= code %>>
+                          <input type="hidden" name="_id" value=<%= passign[i]._id %>>
+                          <input type="hidden" name="email" value=<%= email %>>
+                          <button type="submit" class="btn w-100"><%= passign[i].title %></button>
+                        </form>
+                      </li>
+                    <% } %>
+                  </ul>
+                  <button class="btn mybtn shadow-none w-100 mt-2" onclick="assignpage()";>View all assignments</button>
+                <% }else{ %>
                   <i class="fas fa-3x p-3 fa-check-circle"></i>
-                  <p class="card-text">Nothing posted</p>
-                </div>
+                  <p class="card-text">All assignments ended</p>
+                <% } %>  
             </div>
+          </div>
         </div>
         <div class="col-lg-9 p-3">
             <ul class="nav nav-tabs" id="streamTab" role="tablist">
@@ -107,20 +143,60 @@
                     <%}%>
                 </div>
                 <div class="tab-pane p-3 fade" id="testc" role="tabpanel" aria-labelledby="test-tab">
-                  <div class="card border-dark mb-3 w-100">
-                    <div class="card-header">No tests yet...</div>
-                    <div class="card-body text-dark">
-                      <p class="card-text">Click test button to create a new test</p>
+                  <% if(tests.length==0){ %>
+                    <div class="card border-dark mb-3 w-100">
+                      <div class="card-header">No tests yet...</div>
+                      <div class="card-body text-dark">
+                        <p class="card-text">Click test button to create a new test</p>
+                      </div>
                     </div>
-                  </div>
+                  <% }else{ %>
+                    <% for(var i=tests.length-1;i >=0 ;i--){ %>
+                        <div class="card border-dark mb-3 w-100">
+                            <div class="card-header">
+                              <p class="fs-6">Due on <%= tests[i].duetime %></p>
+                            </div>
+                            <div class="card-body text-dark">
+                              <p class="card-title fw-bold"><%= tests[i].title %></p>
+                              <p class="card-text"><%= tests[i].description %></p>
+                              <form action="/testpage" method="post">
+                                <input type="hidden" name="code" value=<%= code %>>
+                                <input type="hidden" name="_id" value=<%= tests[i]._id %>>
+                                <input type="hidden" name="email" value=<%= email %>>
+                                <button type="submit" class="btn btn-outline-dark">View test</button>
+                              </form>
+                            </div>
+                        </div>
+                    <%}%>
+                  <%}%>
                 </div>
                 <div class="tab-pane p-3 fade" id="assignc" role="tabpanel" aria-labelledby="assign-tab">
-                  <div class="card border-dark mb-3 w-100">
-                    <div class="card-header">No assignments yet...</div>
-                    <div class="card-body text-dark">
-                      <p class="card-text">Click assignment button to make a new assignment</p>
+                  <% if(assign.length==0){ %>
+                    <div class="card border-dark mb-3 w-100">
+                      <div class="card-header">No Assignments yet...</div>
+                      <div class="card-body text-dark">
+                        <p class="card-text">Click assignment button to create a new assignment</p>
+                      </div>
                     </div>
-                  </div>
+                  <% }else{ %>
+                    <% for(var i=assign.length-1;i >=0 ;i--){ %>
+                        <div class="card border-dark mb-3 w-100">
+                            <div class="card-header">
+                              <p class="fs-6">Due on <%= assign[i].duetime %></p>
+                            </div>
+                            <div class="card-body text-dark">
+                              <p class="card-title fw-bold"><%= assign[i].title %></p>
+                              <p class="card-text"><%= assign[i].description %></p>
+                              <form action="/assignpage" method="post">
+                                <input type="hidden" name="code" value=<%= code %>>
+                                <input type="hidden" name="_id" value=<%= assign[i]._id %>>
+                                <input type="hidden" name="email" value=<%= email %>>
+                                <button type="submit" class="btn btn-outline-dark">View Assignment</button>
+                              </form>
+                            </div>
+                        </div>
+                    <%}%>
+                  <%}%>
                 </div>
                 <div class="tab-pane p-3 fade" id="studentc" role="tabpanel" aria-labelledby="student-tab">
                   <% if(students.length==0){ %>
@@ -189,8 +265,10 @@
         <h5 class="modal-title" id="exampleModalLabel">New test</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <form>
+      <form method="POST" action="/test" enctype="multipart/form-data">
+        <div class="modal-body">
+          <input type="hidden" name="code" value=<%= code %>>
+          <input type="hidden" name="email" value=<%= email %>>
           <div class="mb-3">
             <label for="title" class="col-form-label">Title:</label>
             <input type="text" class="form-control" id="title" name="title" required>
@@ -200,19 +278,23 @@
             <textarea class="form-control" id="desc" name="desc" required></textarea>
           </div>
           <div class="mb-3">
-            <label for="qnlink" class="col-form-label">Question link:</label>
-            <input type="text" class="form-control" id="qnlink" name="qnlink">
+            <label for="files" class="col-form-label">Question materials(if any):</label>
+            <input type="file" class="form-control" id="files" name="files" multiple>
           </div>
           <div class="mb-3">
             <label for="due" class="col-form-label">Due date:</label>
-            <input type="date" class="form-control" id="due" name="due" required>
+            <input type="datetime-local" class="form-control" id="due" name="due" required>
           </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Create test</button>
-      </div>
+          <div class="mb-3">
+            <label for="mmark" class="col-form-label">Maximum mark:</label>
+            <input type="number" class="form-control" id="mmark" name="mmark" min="1" max="100" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Create test</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
@@ -224,8 +306,10 @@
         <h5 class="modal-title" id="exampleModalLabel">New assignment</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <form>
+      <form method="POST" action="/assign" enctype="multipart/form-data">
+        <div class="modal-body">
+          <input type="hidden" name="code" value=<%= code %>>
+          <input type="hidden" name="email" value=<%= email %>>
           <div class="mb-3">
             <label for="title" class="col-form-label">Title:</label>
             <input type="text" class="form-control" id="title" name="title" required>
@@ -235,28 +319,60 @@
             <textarea class="form-control" id="desc" name="desc" required></textarea>
           </div>
           <div class="mb-3">
-            <label for="qnlink" class="col-form-label">Question link:</label>
-            <input type="text" class="form-control" id="qnlink" name="qnlink">
+            <label for="files" class="col-form-label">Question materials(if any):</label>
+            <input type="file" class="form-control" id="files" name="files" multiple>
           </div>
           <div class="mb-3">
             <label for="due" class="col-form-label">Due date:</label>
-            <input type="date" class="form-control" id="due" name="due" required>
+            <input type="datetime-local" class="form-control" id="due" name="due" required>
           </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Create assignment</button>
-      </div>
+          <div class="mb-3">
+            <label for="mmark" class="col-form-label">Maximum mark:</label>
+            <input type="number" class="form-control" id="mmark" name="mmark" min="1" max="100" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Create Assignment</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
 
 <script>
-    function copy() {
-        var code="<%= code %>";
-        navigator.clipboard.writeText(code);
+  function copy() {
+    var code="<%= code %>";
+    navigator.clipboard.writeText(code);
+  }
+  function testpage(){
+    var Tabs = document.querySelectorAll('button[data-bs-toggle="tab"]');
+    for (let i = 0; i < Tabs.length; i++) {
+      Tabs[i].classList.remove("active");
     }
+    document.getElementById("test-tab").classList.add("active");
+    var Tabs = document.getElementsByClassName('tab-pane');
+    for (let i = 0; i < Tabs.length; i++) {
+      Tabs[i].classList.remove("show");
+      Tabs[i].classList.remove("active");
+    }
+    document.getElementById("testc").classList.add("show");
+    document.getElementById("testc").classList.add("active");
+  }
+  function assignpage(){
+    var Tabs = document.querySelectorAll('button[data-bs-toggle="tab"]');
+    for (let i = 0; i < Tabs.length; i++) {
+      Tabs[i].classList.remove("active");
+    }
+    document.getElementById("assign-tab").classList.add("active");
+    var Tabs = document.getElementsByClassName('tab-pane');
+    for (let i = 0; i < Tabs.length; i++) {
+      Tabs[i].classList.remove("show");
+      Tabs[i].classList.remove("active");
+    }
+    document.getElementById("assignc").classList.add("show");
+    document.getElementById("assignc").classList.add("active");
+  }  
 </script>
 
 <%- include('partials/footer') %>
