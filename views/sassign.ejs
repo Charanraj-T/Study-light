@@ -1,0 +1,103 @@
+<%- include('partials/header') %>
+
+<section id="stumain">
+    <div id="maincontainer">
+      <div class="row">
+        <div class="col-lg-6">
+          <h1 id="mainhead" class="p-3">Studylight</h1>
+        </div>
+        <div class="col-lg-6">
+          <div class="d-flex justify-content-between">
+            <form action="/sclass" method="POST">
+              <input type="hidden" name="code" value=<%= code %>>
+              <input type="hidden" name="email" value=<%= email %>>
+              <button type="submit" class="btn btn-outline-light m-3">Back to class</button>
+            </form>
+            <a href="/" class="btn btn-outline-light m-3">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+</section>
+
+<section id="assignmain">
+  <div class="d-flex justify-content-between">
+    <p class="fw-bold fs-5">Due: <%= duetime %></p>
+    <p class="fw-bold fs-5">Marks: <%= maxmarks %></p>  
+  </div>
+  <br>
+  <div class="container" id="qnside">
+    <div class="row">
+      <div class="col-lg-9">
+        <h1><%= title %></h1>
+        <hr>
+        <p><%= description %></p>    
+      </div>
+      <div class="col-lg-3">
+          <% if(status=="live"){ %>
+            <% if(submitted==false){ %>
+              <button data-bs-toggle="modal" data-bs-target="#assignmodal" type="submit" name="ansl" id="ansl" class="btn mybtn shadow-none p-2 m-2 w-100">Submit answer</button>
+            <%}else{%>
+              <button disabled class="btn mybtn p-2 m-2 w-100">Submitted</button>
+              <div class="text-center p-2 m-2">
+                <p class="fs-5 fw-bold">Marks scored:<%= score %></p>
+              </div>
+            <% } %>  
+          <%}else{%>
+            <button disabled class="btn mybtn p-2 m-2 w-100">Assignment ended</button>
+            <div class="text-center p-2 m-2">
+              <p class="fs-5 fw-bold">Marks scored:<%= score %></p>
+            </div>
+          <% } %>
+      </div>
+    </div>
+    <br>
+    <div class="row">
+      <% files.forEach(file=>{ %>
+        <div class="col-lg-3 col-md-6">
+          <div class="card m-2" style="max-width: 540px;">
+            <div class="row g-0 text-white">
+              <div class="col-md-3">
+                <i class="fas fa-file fa-4x p-3"></i>
+              </div>
+              <div class="col-md-9">
+                <div class="card-body">
+                  <p class="card-title"><%= file.slice(14) %></p>
+                  <a class="btn btn-outline-light btn-sm" href="/<%= file %>" target="_blank">View file</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  </div>
+</section>
+ 
+<div class="modal fade" id="assignmodal" tabindex="-1" aria-labelledby="ansl" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title h4">Answer submission</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="POST" action="/assignansupdate" enctype="multipart/form-data">
+        <div class="modal-body">
+          <input type="hidden" name="code" value=<%= code %>>
+          <input type="hidden" name="email" value=<%= email %>>
+          <input type="hidden" name="_id" value="<%= _id %>">
+          <div class="mb-3">
+            <label for="files" class="col-form-label">Select the answer files</label>
+            <input type="file" class="form-control" id="files" name="files" multiple required>
+          </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-outline-light" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn mybtn shadow-none">Submit assignment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

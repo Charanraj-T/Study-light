@@ -98,14 +98,14 @@
                     <td>No files submitted</td>
                   <% }else{ %>
                     <td>
-                      <li>
+                      <ol>
                         <% assign.marks[i].files.forEach(f => { %>
-                          <ol><a href="/<f>">f</a></ol>
+                          <li><a href="/<%= f %>" target="_blank"><%= f.slice(14) %></a></li>
                         <% }); %>
-                      </li>
+                        </ol>
                     </td>
                   <% } %>
-                  <td><input type="number" min="0" max="<%= assign.maxmarks %>" class="form-control" id="<%=i%>" name="<%=i%>" value="<%= assign.marks[i].mark %>" placeholder="<%= assign.marks[i].mark %>"></td>
+                  <td><input type="number" max="<%= assign.maxmarks %>" class="form-control" id="<%=i%>" name="<%=i%>" value="<%= assign.marks[i].mark %>" placeholder="<%= assign.marks[i].mark %>"></td>
                 </tr>
               <% } %>
             </tbody>

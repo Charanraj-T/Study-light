@@ -36,23 +36,59 @@
     <div class="row w-100">
         <div class="col-lg-3 px-3">
             <div class="card mx-auto text-center my-3 border-dark" style="max-width: 18rem;">
-                <div class="card-header text-white">    
-                  <h3 class="h3 card-title">Tests pending</h3>
-                </div>
-                <div class="card-body bg-light">
+              <div class="card-header text-white">    
+                <h3 class="h3 card-title">Tests pending</h3>
+              </div>
+              <div class="card-body bg-light">
+                <% var ptest=tests.filter(test=>(test.status=="live"))%>
+                <% if (ptest.length!=0) { %>
+                  <ul class="list-group">
+                    <% var l= ptest.length < 5 ? ptest.length : 5%>
+                    <% for(i=0;i < l;i++){ %>
+                      <li class="list-group-item">
+                        <form action="/stestpage" method="post">
+                          <input type="hidden" name="code" value=<%= code %>>
+                          <input type="hidden" name="_id" value=<%= ptest[i]._id %>>
+                          <input type="hidden" name="email" value=<%= email %>>
+                          <button type="submit" class="btn w-100"><%= ptest[i].title %></button>
+                        </form>
+                      </li>
+                    <% } %>
+                  </ul>
+                  <button class="btn mybtn shadow-none w-100 mt-2" onclick="testpage()";>View all tests</button>
+                <% }else{ %>
                   <i class="fas fa-3x p-3 fa-check-circle"></i>
-                  <p class="card-text">All completed</p>
-                </div>
+                  <p class="card-text">All tests ended</p>
+                <% } %>  
+              </div>
             </div>
             <div class="card mx-auto text-center my-3 border-dark" style="max-width: 18rem;">
-                <div class="card-header text-white">   
-                  <h3 class="h3 card-title">Assignments</h3>
-                </div>
-                <div class="card-body bg-light">
+              <div class="card-header text-white">    
+                <h3 class="h3 card-title">Assigments pending</h3>
+              </div>
+              <div class="card-body bg-light">
+                <% var passign=assign.filter(a=>(a.status=="live"))%>
+                <% if (passign.length!=0) { %>
+                  <ul class="list-group">
+                    <% var l= passign.length < 5 ? passign.length : 5%>
+                    <% for(i=0;i < l;i++){ %>
+                      <li class="list-group-item">
+                        <form action="/sassignpage" method="post">
+                          <input type="hidden" name="code" value=<%= code %>>
+                          <input type="hidden" name="_id" value=<%= passign[i]._id %>>
+                          <input type="hidden" name="email" value=<%= email %>>
+                          <button type="submit" class="btn w-100"><%= passign[i].title %></button>
+                        </form>
+                      </li>
+                    <% } %>
+                  </ul>
+                  <button class="btn mybtn shadow-none w-100 mt-2" onclick="assignpage()";>View all assignments</button>
+                <% }else{ %>
                   <i class="fas fa-3x p-3 fa-check-circle"></i>
-                  <p class="card-text">All completed</p>
-                </div>
+                  <p class="card-text">All assignments ended</p>
+                <% } %>  
             </div>
+          </div>>
         </div>
         <div class="col-lg-9 p-3">
             <ul class="nav nav-tabs" id="streamTab" role="tablist">
@@ -100,20 +136,60 @@
                     <%}%>
                 </div>
                 <div class="tab-pane p-3 fade" id="testc" role="tabpanel" aria-labelledby="test-tab">
-                  <div class="card border-dark mb-3 w-100">
-                    <div class="card-header">No tests yet...</div>
-                    <div class="card-body text-dark">
-                      <p class="card-text">Check back later</p>
+                  <% if(tests.length==0){ %>
+                    <div class="card border-dark mb-3 w-100">
+                      <div class="card-header">No tests yet...</div>
+                      <div class="card-body text-dark">
+                        <p class="card-text">Click test button to create a new test</p>
+                      </div>
                     </div>
-                  </div>
+                  <% }else{ %>
+                    <% for(var i=tests.length-1;i >=0 ;i--){ %>
+                        <div class="card border-dark mb-3 w-100">
+                            <div class="card-header">
+                              <p class="fs-6">Due on <%= tests[i].duetime %></p>
+                            </div>
+                            <div class="card-body text-dark">
+                              <p class="card-title fw-bold"><%= tests[i].title %></p>
+                              <p class="card-text"><%= tests[i].description %></p>
+                              <form action="/stestpage" method="post">
+                                <input type="hidden" name="code" value=<%= code %>>
+                                <input type="hidden" name="_id" value=<%= tests[i]._id %>>
+                                <input type="hidden" name="email" value=<%= email %>>
+                                <button type="submit" class="btn btn-outline-dark">View test</button>
+                              </form>
+                            </div>
+                        </div>
+                    <%}%>
+                  <%}%>
                 </div>
                 <div class="tab-pane p-3 fade" id="assignc" role="tabpanel" aria-labelledby="assign-tab">
-                  <div class="card border-dark mb-3 w-100">
-                    <div class="card-header">No assignments yet...</div>
-                    <div class="card-body text-dark">
-                      <p class="card-text">Check back later</p>
+                  <% if(assign.length==0){ %>
+                    <div class="card border-dark mb-3 w-100">
+                      <div class="card-header">No Assignments yet...</div>
+                      <div class="card-body text-dark">
+                        <p class="card-text">Click assignment button to create a new assignment</p>
+                      </div>
                     </div>
-                  </div>
+                  <% }else{ %>
+                    <% for(var i=assign.length-1;i >=0 ;i--){ %>
+                        <div class="card border-dark mb-3 w-100">
+                            <div class="card-header">
+                              <p class="fs-6">Due on <%= assign[i].duetime %></p>
+                            </div>
+                            <div class="card-body text-dark">
+                              <p class="card-title fw-bold"><%= assign[i].title %></p>
+                              <p class="card-text"><%= assign[i].description %></p>
+                              <form action="/sassignpage" method="post">
+                                <input type="hidden" name="code" value=<%= code %>>
+                                <input type="hidden" name="_id" value=<%= assign[i]._id %>>
+                                <input type="hidden" name="email" value=<%= email %>>
+                                <button type="submit" class="btn btn-outline-dark">View Assignment</button>
+                              </form>
+                            </div>
+                        </div>
+                    <%}%>
+                  <%}%>
                 </div>
                 <div class="tab-pane p-3 fade" id="studentc" role="tabpanel" aria-labelledby="student-tab">
                     <div class="row">
@@ -164,6 +240,37 @@
       </div>
     </div>
 </div>
-  
+
+<script>
+  function testpage(){
+    var Tabs = document.querySelectorAll('button[data-bs-toggle="tab"]');
+    for (let i = 0; i < Tabs.length; i++) {
+      Tabs[i].classList.remove("active");
+    }
+    document.getElementById("test-tab").classList.add("active");
+    var Tabs = document.getElementsByClassName('tab-pane');
+    for (let i = 0; i < Tabs.length; i++) {
+      Tabs[i].classList.remove("show");
+      Tabs[i].classList.remove("active");
+    }
+    document.getElementById("testc").classList.add("show");
+    document.getElementById("testc").classList.add("active");
+  }
+  function assignpage(){
+    var Tabs = document.querySelectorAll('button[data-bs-toggle="tab"]');
+    for (let i = 0; i < Tabs.length; i++) {
+      Tabs[i].classList.remove("active");
+    }
+    document.getElementById("assign-tab").classList.add("active");
+    var Tabs = document.getElementsByClassName('tab-pane');
+    for (let i = 0; i < Tabs.length; i++) {
+      Tabs[i].classList.remove("show");
+      Tabs[i].classList.remove("active");
+    }
+    document.getElementById("assignc").classList.add("show");
+    document.getElementById("assignc").classList.add("active");
+  }  
+</script>
+
 
 <%- include('partials/footer') %>

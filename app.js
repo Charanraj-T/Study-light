@@ -228,6 +228,69 @@ app.post("/testpage",(req,res)=>{
     });
 });
 
+app.post("/stestpage",(req,res)=>{
+    Test.findOne({_id:req.body._id},function(e,foundTest){
+        if(e){
+            console.log(e);
+        }else{
+            Student.findOne({email:req.body.email},function(e,foundStudent){
+                var mark=(foundTest.marks.filter(m=>m.id==foundStudent._id))[0];
+                var score=mark.mark==0?"pending":mark.mark;
+                res.render("stest",{
+                    code:req.body.code,
+                    email:req.body.email,
+                    duetime:foundTest.duetime,
+                    maxmarks:foundTest.maxmarks,
+                    title:foundTest.title,
+                    description:foundTest.description,
+                    status:foundTest.status,
+                    files:foundTest.files,
+                    submitted:mark.isSub,
+                    score:score,
+                    _id:foundTest._id
+                });
+            });
+        }
+    });
+});
+
+app.post("/testansupdate",upload.array('files'),(req,res)=>{
+    Test.findOne({_id:req.body._id},function(e,foundTest){
+        if(e){
+            console.log(e);
+        }else{
+            Student.findOne({email:req.body.email},function(e,foundStudent){
+                for(let i=0;i<foundTest.marks.length;i++){
+                    if(foundTest.marks[i].id=foundStudent._id)
+                    {
+                        foundTest.marks[i].files=req.files.map(a=>a.filename);
+                        foundTest.marks[i].isSub=true;
+                    }
+                }
+                foundTest.save((e)=>{
+                    if(e){
+                        console.log(e);
+                    }else{
+                        res.render("stest",{
+                            code:req.body.code,
+                            email:req.body.email,
+                            duetime:foundTest.duetime,
+                            maxmarks:foundTest.maxmarks,
+                            title:foundTest.title,
+                            description:foundTest.description,
+                            status:foundTest.status,
+                            files:foundTest.files,
+                            submitted:true,
+                            score:"pending",
+                            _id:foundTest._id
+                        });
+                    }
+                });
+            });
+        }
+    });     
+});
+
 app.post("/endtest",(req,res)=>{
     Test.findOneAndUpdate({_id:req.body._id}, {$set:{status:"ended"}},{new: true},(e, foundTest)=>{
         if(e){
@@ -326,6 +389,69 @@ app.post("/assignpage",(req,res)=>{
             });
         }
     });
+});
+
+app.post("/sassignpage",(req,res)=>{
+    Assign.findOne({_id:req.body._id},function(e,founda){
+        if(e){
+            console.log(e);
+        }else{
+            Student.findOne({email:req.body.email},function(e,foundStudent){
+                var mark=(founda.marks.filter(m=>m.id==foundStudent._id))[0];
+                var score=mark.mark==0?"pending":mark.mark;
+                res.render("sassign",{
+                    code:req.body.code,
+                    email:req.body.email,
+                    duetime:founda.duetime,
+                    maxmarks:founda.maxmarks,
+                    title:founda.title,
+                    description:founda.description,
+                    status:founda.status,
+                    files:founda.files,
+                    submitted:mark.isSub,
+                    score:score,
+                    _id:founda._id
+                });
+            });
+        }
+    });
+});
+
+app.post("/assignansupdate",upload.array('files'),(req,res)=>{
+    Assign.findOne({_id:req.body._id},function(e,founda){
+        if(e){
+            console.log(e);
+        }else{
+            Student.findOne({email:req.body.email},function(e,foundStudent){
+                for(let i=0;i<founda.marks.length;i++){
+                    if(founda.marks[i].id=foundStudent._id)
+                    {
+                        founda.marks[i].files=req.files.map(a=>a.filename);
+                        founda.marks[i].isSub=true;
+                    }
+                }
+                founda.save((e)=>{
+                    if(e){
+                        console.log(e);
+                    }else{
+                        res.render("sassign",{
+                            code:req.body.code,
+                            email:req.body.email,
+                            duetime:founda.duetime,
+                            maxmarks:founda.maxmarks,
+                            title:founda.title,
+                            description:founda.description,
+                            status:founda.status,
+                            files:founda.files,
+                            submitted:true,
+                            score:"pending",
+                            _id:founda._id
+                        });
+                    }
+                });
+            });
+        }
+    });     
 });
 
 app.post("/endassign",(req,res)=>{
@@ -537,7 +663,9 @@ app.post("/scpost",upload.array('files'),(req,res)=>{
                                             email:req.body.email,
                                             classname:foundClass.name,
                                             students:records,
-                                            posts:foundClass.posts
+                                            posts:foundClass.posts,
+                                            tests:foundClass.tests,
+                                            assign:foundClass.assign
                                         });
                                     }
                                 });
@@ -621,7 +749,9 @@ app.post("/sclass",(req,res)=>{
                         classname:foundClass.name,
                         students:records,
                         code:foundClass.code,
-                        posts:foundClass.posts
+                        posts:foundClass.posts,
+                        tests:foundClass.tests,
+                        assign:foundClass.assign
                     });
                 }
             });
@@ -698,7 +828,9 @@ app.post("/joinclass",(req,res)=>{
                                         classname:foundClass.name,
                                         students:records,
                                         code:foundClass.code,
-                                        posts:foundClass.posts
+                                        posts:foundClass.posts,
+                                        tests:foundClass.tests,
+                                        assign:foundClass.assign
                                     });
                                 }
                             });
@@ -717,7 +849,9 @@ app.post("/joinclass",(req,res)=>{
                                         classname:foundClass.name,
                                         students:records,
                                         code:foundClass.code,
-                                        posts:foundClass.posts
+                                        posts:foundClass.posts,
+                                        tests:foundClass.tests,
+                                        assign:foundClass.assign
                                     });
                                 }
                             });
