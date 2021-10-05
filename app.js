@@ -59,7 +59,7 @@ const testSchema = new mongoose.Schema ({
 
 const Test =new mongoose.model("Test",testSchema);
 
-const assignSchema = new mongoose.Schema ({
+const assignmentSchema = new mongoose.Schema ({
     title:String,
     description:String,
     duetime:String,
@@ -75,16 +75,16 @@ const assignSchema = new mongoose.Schema ({
     files:[String]
 });
 
-const Assign =new mongoose.model("Assign",assignSchema);
+const Assignment =new mongoose.model("Assignment",assignmentSchema);
 
 const classSchema = new mongoose.Schema ({
     name:String,
     code:String,
     teacher: String,
-    students:[String],
-    posts:[postSchema],
-    tests:[testSchema],
-    assign:[assignSchema]
+    students:[{ type: mongoose.Schema.Types.ObjectId, ref: 'Student' }],
+    posts:[{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }],
+    tests:[{ type: mongoose.Schema.Types.ObjectId, ref: 'Test' }],
+    assignments:[{ type: mongoose.Schema.Types.ObjectId, ref: 'Assignment' }]
 });
 
 const Class = new mongoose.model("Class", classSchema);
@@ -94,7 +94,7 @@ const studentSchema = new mongoose.Schema ({
     email: String,
     password: String,
     phone:Number,
-    classes:[classSchema],
+    classes:[{ type: mongoose.Schema.Types.ObjectId, ref: 'Class' }],
     periods:[[String]]
 });
     
@@ -105,7 +105,7 @@ const teacherSchema = new mongoose.Schema ({
     email: String,
     password: String,
     phone:Number,
-    classes:[classSchema],
+    classes:[{ type: mongoose.Schema.Types.ObjectId, ref: 'Class' }],
     periods:[[String]]
 });
     
@@ -124,11 +124,11 @@ function checkdue(){
             });
         } 
     });
-    Assign.find({},(e,foundassign)=>{
+    Assignment.find({},(e,foundassignment)=>{
         if(e){
             console.log(e);
         }else{
-            foundassign.forEach(a=>{
+            foundassignment.forEach(a=>{
                 if(new Date(a.duetime)<new Date()){
                     a.status="ended";
                     a.save();
@@ -137,6 +137,8 @@ function checkdue(){
         } 
     });
 }
+
+                    // homepage
 
 app.get("/",(req,res)=>{
     res.render("home",{
@@ -160,8 +162,471 @@ app.get('/:filename', (req, res) => {
     });
 });
 
+                    //enrollment
+
+app.post("/stureg", function(req, res){
+    const email=req.body.email.toLowerCase();
+    Student.findOne({email:email},(e,foundUser)=>{
+        if(e){
+            console.log(e);
+        }else{
+            if(foundUser){
+                res.render("home",{
+                    regerror:"User already registered!!",
+                    logerror:""
+                });
+            }else{
+                bcrypt.hash(req.body.password, 10, function(e, hash) {
+                    if(e){
+                        console.log(e);
+                    }else{    
+                        const newStudent =  new Student({
+                            email: req.body.email.toLowerCase(),
+                            name:req.body.name,
+                            phone:req.body.phone,
+                            password: hash,
+                            periods:[
+                                ["Monday","N/A","N/A","N/A","N/A","N/A"],
+                                ["Tuesday","N/A","N/A","N/A","N/A","N/A"],
+                                ["wednesday","N/A","N/A","N/A","N/A","N/A"],
+                                ["Thursday","N/A","N/A","N/A","N/A","N/A"],
+                                ["Friday","N/A","N/A","N/A","N/A","N/A"]
+                            ]
+                        });
+                        
+                        newStudent.save(function(err){
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                res.render("student",{
+                                    name:req.body.name,
+                                    email: req.body.email.toLowerCase(),
+                                    classes:[],
+                                    error:""
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        }
+    });
+});
+
+app.post("/teareg", function(req, res){
+    const email=req.body.email.toLowerCase();
+    Teacher.findOne({email:email},(e,foundUser)=>{
+        if(e){
+            console.log(e);
+        }else{
+            if(foundUser){
+                res.render("home",{
+                    regerror:"User already registered!!",
+                    logerror:""
+                });
+            }else{
+                bcrypt.hash(req.body.password, 10, function(e, hash) {
+                    if(e){
+                        console.log(e);
+                    }else{    
+                        const newTeacher =  new Teacher({
+                            email: req.body.email.toLowerCase(),
+                            name:req.body.name,
+                            phone:req.body.phone,
+                            password: hash,
+                            periods:[
+                                ["Monday","N/A","N/A","N/A","N/A","N/A"],
+                                ["Tuesday","N/A","N/A","N/A","N/A","N/A"],
+                                ["wednesday","N/A","N/A","N/A","N/A","N/A"],
+                                ["Thursday","N/A","N/A","N/A","N/A","N/A"],
+                                ["Friday","N/A","N/A","N/A","N/A","N/A"]
+                            ]
+                        });
+                        
+                        newTeacher.save(function(err){
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                res.render("teacher",{
+                                    name:req.body.name,
+                                    email: req.body.email.toLowerCase(),
+                                    classes:[],
+                                    error:""
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        }
+    });
+});
+
+app.post("/stulog", function(req, res){
+    const email=req.body.email.toLowerCase();
+    const password=req.body.password;
+            
+    Student.findOne({email:email}).populate('classes').exec((e,foundUser)=>{
+        if (e) {
+            console.log(e);
+        } else {
+            if (foundUser) {
+                bcrypt.compare(password, foundUser.password, function(err, result) {
+                    if (result === true) {
+                        res.render("student",{
+                            name:foundUser.name,
+                            email:foundUser.email,
+                            classes:foundUser.classes,
+                            error:""
+                        });
+                    }else{
+                        res.render("home",{
+                            regerror:"",
+                            logerror:"Invalid username or password!!"
+                        });
+                    }
+                });
+            }else{
+                res.render("home",{
+                    regerror:"",
+                    logerror:"Invalid username or password!!"
+                });
+            }
+        }
+    });
+});
+
+app.post("/tealog", function(req, res){
+    const email=req.body.email.toLowerCase();
+    const password = req.body.password;
+
+    Teacher.findOne({email:req.body.email}).populate('classes').exec((e,foundUser)=>{
+        if (e) {
+            console.log(e);
+        } else {
+            if (foundUser) {
+                bcrypt.compare(password, foundUser.password, function(err, result) {
+                    if (result === true) {
+                        res.render("teacher",{
+                            name:foundUser.name,
+                            email:foundUser.email,
+                            classes:foundUser.classes,
+                            error:""
+                        });
+                    }else{
+                        res.render("home",{
+                            regerror:"",
+                            logerror:"Invalid username or password!!"
+                        });
+                    }
+                });
+            }else{
+                res.render("home",{
+                    regerror:"",
+                    logerror:"Invalid username or password!!"
+                });
+            }
+        }
+    });
+});
+
+                    // class and userhomepages
+
+app.post("/home",(req,res)=>{
+    Teacher.findOne({email:req.body.email}).populate('classes').exec((e,foundUser)=>{
+        if(e){
+            console.log(e);
+        }else{
+            res.render("teacher",{
+                name:foundUser.name,
+                email:foundUser.email,
+                classes:foundUser.classes,
+                error:""
+            });
+        }
+    });
+});
+
+app.post("/shome",(req,res)=>{
+    Student.findOne({email:req.body.email}).populate('classes').exec((e,foundUser)=>{
+        if(e){
+            console.log(e);
+        }else{
+            res.render("student",{
+                name:foundUser.name,
+                email:foundUser.email,
+                classes:foundUser.classes,
+                error:""
+            });
+        }
+    });
+});
+
+app.post("/class",(req,res)=>{
+    Class.findOne({code:req.body.code})
+    .populate('posts').populate('tests').populate('assignments').populate('students').
+    exec((e,foundClass)=>{
+        if(e){
+            console.log(e);
+        }else{
+            checkdue();
+            res.render("class",{
+                code:foundClass.code,
+                name:foundClass.teacher,
+                email:req.body.email,
+                classname:foundClass.name,
+                students:foundClass.students,
+                posts:foundClass.posts,
+                tests:foundClass.tests,
+                assign:foundClass.assignments
+            });
+        }
+    });
+});
+
+app.post("/sclass",(req,res)=>{
+    Class.findOne({code:req.body.code})
+    .populate('posts').populate('tests').populate('assignments').populate('students').
+    exec((e,foundClass)=>{
+        if(e){
+            console.log(e);
+        }else{
+            res.render("sclass",{
+                name:foundClass.teacher,
+                email:req.body.email,
+                classname:foundClass.name,
+                students:foundClass.students,
+                code:foundClass.code,
+                posts:foundClass.posts,
+                tests:foundClass.tests,
+                assign:foundClass.assignments
+            });
+        }
+    });
+});
+                    
+                    // class create and join
+
+app.post("/createclass",(req,res)=>{
+    Class.count({}, function( err, count){
+        if(err){
+            console.log(err);
+        }else{
+            Teacher.findOne({email:req.body.email}).populate('classes').exec((e,foundUser)=>{
+                if(e){
+                    console.log(e);
+                }else{
+                    if(foundUser.classes.some(e => e.name == req.body.classname)){
+                        res.render("teacher",{
+                            name:req.body.name,
+                            email: req.body.email,
+                            classes:foundUser.classes,
+                            error:"Classroom exists already!!"
+                        });
+                    }else{
+                        const newClass =  new Class({
+                            teacher:req.body.name,
+                            name:req.body.classname,
+                            code:"SL"+String(count+1).padStart(4,'0')
+                        });
+                        foundUser.classes.push(newClass);
+                        foundUser.save();
+                        newClass.save(function(err){
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                checkdue();
+                                res.render("class",{
+                                    code:"SL"+String(count+1).padStart(4,'0'),
+                                    name:req.body.name,
+                                    classname:req.body.classname,
+                                    email:foundUser.email,
+                                    students:[],
+                                    posts:[],
+                                    tests:[],
+                                    assign:[]
+                                });
+                            }
+                        }); 
+                    }
+                }
+            });
+        } 
+    });
+});
+
+app.post("/joinclass",(req,res)=>{
+    Class.findOne({code:req.body.code})
+    .populate('posts').populate('tests').populate('assignments').populate('students').
+    exec((e,foundClass)=>{
+        if(e){
+            console.log(e);
+        }else{
+            Student.findOne({email:req.body.email}).populate('classes').exec((e,foundUser)=>{
+                if(foundClass){
+                    if(e){
+                        console.log(e);
+                    }else{
+                        if(foundUser.classes.some(e => e.code == req.body.code)){
+                            res.render("sclass",{
+                                name:foundClass.teacher,
+                                email:req.body.email,
+                                classname:foundClass.name,
+                                students:foundClass.students,
+                                code:foundClass.code,
+                                posts:foundClass.posts,
+                                tests:foundClass.tests,
+                                assign:foundClass.assignments
+                            });
+                        }else{
+                            foundUser.classes.push(foundClass);
+                            foundUser.save();
+                            foundClass.students.push(foundUser);
+                            foundClass.save();
+                            let tests=foundClass.tests.map((i)=>{return i._id;});
+                            Test.find().where('_id').in(tests).exec((err, records) => {
+                                records.forEach(test=>{
+                                    let d={
+                                        name:foundUser.name,
+                                        mark:0,
+                                        id:foundUser._id,
+                                        isSub:false
+                                    };
+                                    test.marks.push(d);
+                                    test.save();
+                                });
+                            });
+                            let assignments=foundClass.assignments.map((i)=>{return i._id;}); 
+                            Assignment.find().where('_id').in(assignments).exec((err, records) => {
+                                records.forEach(a=>{
+                                    let d={
+                                        name:foundUser.name,
+                                        mark:0,
+                                        id:foundUser._id,
+                                        isSub:false
+                                    };
+                                    a.marks.push(d);
+                                    a.save();
+                                });
+                            });
+                            res.render("sclass",{
+                                name:foundClass.teacher,
+                                email:req.body.email,
+                                classname:foundClass.name,
+                                students:foundClass.students,
+                                code:foundClass.code,
+                                posts:foundClass.posts,
+                                tests:foundClass.tests,
+                                assign:foundClass.assignments
+                            });
+                        }
+                    }
+                }else{
+                    res.render("student",{
+                        name:foundUser.name,
+                        email:foundUser.email,
+                        classes:foundUser.classes,
+                        error:"Class not found!!"
+                    });
+                }
+            });
+        }
+    });
+});
+
+                    // post feature
+
+app.post("/cpost",upload.array('files'),(req,res)=>{
+    Class.findOne({code:req.body.code})
+    .populate('posts').populate('tests').populate('assignments').populate('students').
+    exec((e,foundClass)=>{
+        if(e){
+            console.log(e);
+        }else{
+            const newPost =  new Post({
+                author:req.body.author,
+                title:req.body.title,
+                description:req.body.desc,
+                posttime: new Date().toString().slice(4,24)
+            });
+            if(req.files){
+                newPost.files=req.files.map(a=>a.filename);
+            }
+            newPost.save((e)=>{
+                if(e){
+                    console.log(e);
+                }else{
+                    foundClass.posts.push(newPost);
+                    foundClass.save((e)=>{
+                        checkdue();
+                        res.render("class",{
+                            code:foundClass.code,
+                            name:foundClass.teacher,
+                            email:req.body.email,
+                            classname:foundClass.name,
+                            students:foundClass.students,
+                            posts:foundClass.posts,
+                            tests:foundClass.tests,
+                            assign:foundClass.assignments
+                        });
+                    });
+                }
+            });
+        }
+    });
+});
+
+app.post("/scpost",upload.array('files'),(req,res)=>{
+    Class.findOne({code:req.body.code})
+    .populate('posts').populate('tests').populate('assignments').populate('students').
+    exec((e,foundClass)=>{
+        if(e){
+            console.log(e);
+        }else{
+            Student.findOne({email:req.body.email}).populate("classes").exec((e,foundUser)=>{
+                if(e){
+                    console.log(e);
+                }else{
+                    const newPost =  new Post({
+                        author:foundUser.name,
+                        title:req.body.title,
+                        description:req.body.desc,
+                        posttime: new Date().toString().slice(4,24)
+                    });
+                    if(req.files){
+                        newPost.files=req.files.map(a=>a.filename);
+                    }
+                    newPost.save((e)=>{
+                        if(e){
+                            console.log(e);
+                        }else{
+                            foundClass.posts.push(newPost);
+                            foundClass.save((e)=>{
+                                res.render("sclass",{
+                                    code:foundClass.code,
+                                    name:foundClass.teacher,
+                                    email:req.body.email,
+                                    classname:foundClass.name,
+                                    students:foundClass.students,
+                                    posts:foundClass.posts,
+                                    tests:foundClass.tests,
+                                    assign:foundClass.assignments
+                                });
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    });
+});
+                    
+                    // test feature
+
 app.post("/test",upload.array('files'),(req,res)=>{
-    Class.findOne({code:req.body.code},(e,foundClass)=>{
+    Class.findOne({code:req.body.code})
+    .populate('posts').populate('tests').populate('assignments').populate('students').
+    exec((e,foundClass)=>{
         if(e){
             console.log(e);
         }else{
@@ -172,40 +637,34 @@ app.post("/test",upload.array('files'),(req,res)=>{
                 maxmarks:req.body.mmark,
                 status:"live"
             });
-            Student.find().where('_id').in(foundClass.students).exec((err, records) => {
-                if(err){
-                    console.log(err);
+            foundClass.students.forEach(record=>{
+                let d={
+                    name:record.name,
+                    mark:0,
+                    id:record._id,
+                    isSub:false
+                };
+                newtest.marks.push(d);
+            });
+            if(req.files){
+                newtest.files=req.files.map(a=>a.filename);
+            }
+            newtest.save((e)=>{
+                if(e){
+                    console.log(e);
                 }else{
-                    records.forEach(record=>{
-                        let d={
-                            name:record.name,
-                            mark:0,
-                            id:record._id,
-                            isSub:false
-                        };
-                        newtest.marks.push(d);
-                        if(req.files){
-                            newtest.files=req.files.map(a=>a.filename);
-                        }
-                        newtest.save((e)=>{
-                            if(e){
-                                console.log(e);
-                            }else{
-                                foundClass.tests.push(newtest);
-                                foundClass.save((e)=>{
-                                    checkdue();
-                                    res.render("class",{
-                                        code:foundClass.code,
-                                        name:foundClass.teacher,
-                                        email:req.body.email,
-                                        classname:foundClass.name,
-                                        students:records,
-                                        posts:foundClass.posts,
-                                        tests:foundClass.tests,
-                                        assign:foundClass.assign
-                                    });
-                                });
-                            }
+                    foundClass.tests.push(newtest);
+                    foundClass.save((e)=>{
+                        checkdue();
+                        res.render("class",{
+                            code:foundClass.code,
+                            name:foundClass.teacher,
+                            email:req.body.email,
+                            classname:foundClass.name,
+                            students:foundClass.students,
+                            posts:foundClass.posts,
+                            tests:foundClass.tests,
+                            assign:foundClass.assignments
                         });
                     });
                 }
@@ -323,62 +782,60 @@ app.post("/markupdate",(req,res)=>{
     });
 });
 
+                    // assignment feature
+
 app.post("/assign",upload.array('files'),(req,res)=>{
-    Class.findOne({code:req.body.code},(e,foundClass)=>{
+    Class.findOne({code:req.body.code})
+    .populate('posts').populate('tests').populate('assignments').populate('students').
+    exec((e,foundClass)=>{
         if(e){
             console.log(e);
         }else{
-            const newassign =  new Assign({
+            const newassignment =  new Assignment({
                 title:req.body.title,
                 description:req.body.desc,
                 duetime: new Date(req.body.due).toLocaleDateString()+" "+new Date(req.body.due).toLocaleTimeString(),   
                 maxmarks:req.body.mmark,
                 status:"live"
             });
-            Student.find().where('_id').in(foundClass.students).exec((err, records) => {
-                if(err){
-                    console.log(err);
+            foundClass.students.forEach(record=>{
+                let d={
+                    name:record.name,
+                    mark:0,
+                    id:record._id,
+                    isSub:false
+                };
+                newassignment.marks.push(d);
+            });
+            if(req.files){
+                newassignment.files=req.files.map(a=>a.filename);
+            }
+            newassignment.save((e)=>{
+                if(e){
+                    console.log(e);
                 }else{
-                    records.forEach(record=>{
-                        let d={
-                            name:record.name,
-                            mark:0,
-                            id:record._id,
-                            isSub:false
-                        };
-                        newassign.marks.push(d);
-                        if(req.files){
-                            newassign.files=req.files.map(a=>a.filename);
-                        }
-                        newassign.save((e)=>{
-                            if(e){
-                                console.log(e);
-                            }else{
-                                foundClass.assign.push(newassign);
-                                foundClass.save((e)=>{
-                                    checkdue();
-                                    res.render("class",{
-                                        code:foundClass.code,
-                                        name:foundClass.teacher,
-                                        email:req.body.email,
-                                        classname:foundClass.name,
-                                        students:records,
-                                        posts:foundClass.posts,
-                                        tests:foundClass.tests,
-                                        assign:foundClass.assign
-                                    });
-                                });
-                            }
+                    foundClass.assignments.push(newassignment);
+                    foundClass.save((e)=>{
+                        checkdue();
+                        res.render("class",{
+                            code:foundClass.code,
+                            name:foundClass.teacher,
+                            email:req.body.email,
+                            classname:foundClass.name,
+                            students:foundClass.students,
+                            posts:foundClass.posts,
+                            tests:foundClass.tests,
+                            assign:foundClass.assignments
                         });
                     });
                 }
-            });   
+            });
         }
     });
 });
 
 app.post("/assignpage",(req,res)=>{
-    Assign.findOne({_id:req.body._id},function(e,founda){
+    Assignment.findOne({_id:req.body._id},function(e,founda){
         if(e){
             console.log(e);
         }else{
@@ -392,7 +849,7 @@ app.post("/assignpage",(req,res)=>{
 });
 
 app.post("/sassignpage",(req,res)=>{
-    Assign.findOne({_id:req.body._id},function(e,founda){
+    Assignment.findOne({_id:req.body._id},function(e,founda){
         if(e){
             console.log(e);
         }else{
@@ -418,7 +875,7 @@ app.post("/sassignpage",(req,res)=>{
 });
 
 app.post("/assignansupdate",upload.array('files'),(req,res)=>{
-    Assign.findOne({_id:req.body._id},function(e,founda){
+    Assignment.findOne({_id:req.body._id},function(e,founda){
         if(e){
             console.log(e);
         }else{
@@ -455,7 +912,7 @@ app.post("/assignansupdate",upload.array('files'),(req,res)=>{
 });
 
 app.post("/endassign",(req,res)=>{
-    Assign.findOneAndUpdate({_id:req.body._id}, {$set:{status:"ended"}},{new: true},(e, founda)=>{
+    Assignment.findOneAndUpdate({_id:req.body._id}, {$set:{status:"ended"}},{new: true},(e, founda)=>{
         if(e){
             console.log(e);
         }else{
@@ -469,7 +926,7 @@ app.post("/endassign",(req,res)=>{
 });
 
 app.post("/assignmarkupdate",(req,res)=>{
-    Assign.findOne({_id:req.body._id},function(e,founda){
+    Assignment.findOne({_id:req.body._id},function(e,founda){
         if(e){
             console.log(e);
         }else{
@@ -485,6 +942,8 @@ app.post("/assignmarkupdate",(req,res)=>{
         }
     });
 });
+
+                    // timetable feature
 
 app.post("/timetable",(req,res)=>{
     const ptype=req.body.type;
@@ -557,7 +1016,7 @@ app.post("/tableupdate",(req,res)=>{
 app.post("/tablehome",(req,res)=>{
     const ptype=req.body.type;
     if(ptype=="student"){
-        Student.findOne({email:req.body.email},function(e,foundUser){
+        Student.findOne({email:req.body.email}).populate('classes').exec(function(e,foundUser){
             if(e){
                 console.log(e);
             }else{
@@ -570,7 +1029,7 @@ app.post("/tablehome",(req,res)=>{
             }
         });
     }else{
-        Teacher.findOne({email:req.body.email},function(e,foundUser){
+        Teacher.findOne({email:req.body.email}).populate('classes').exec(function(e,foundUser){
             if(e){
                 console.log(e);
             }else{
@@ -585,457 +1044,8 @@ app.post("/tablehome",(req,res)=>{
     }
 });
 
-app.post("/cpost",upload.array('files'),(req,res)=>{
-    Class.findOne({code:req.body.code},(e,foundClass)=>{
-        if(e){
-            console.log(e);
-        }else{
-            const newPost =  new Post({
-                author:req.body.author,
-                title:req.body.title,
-                description:req.body.desc,
-                posttime: new Date().toString().slice(4,24)
-            });
-            if(req.files){
-                newPost.files=req.files.map(a=>a.filename);
-            }
-            newPost.save((e)=>{
-                if(e){
-                    console.log(e);
-                }else{
-                    foundClass.posts.push(newPost);
-                    foundClass.save((e)=>{
-                        Student.find().where('_id').in(foundClass.students).exec((err, records) => {
-                            if(err){
-                                console.log(err);
-                            }else{
-                                checkdue();
-                                res.render("class",{
-                                    code:foundClass.code,
-                                    name:foundClass.teacher,
-                                    email:req.body.email,
-                                    classname:foundClass.name,
-                                    students:records,
-                                    posts:foundClass.posts,
-                                    tests:foundClass.tests,
-                                    assign:foundClass.assign
-                                });
-                            }
-                        });
-                    });
-                }
-            });
-        }
-    });
-});
+                    //server start
 
-app.post("/scpost",upload.array('files'),(req,res)=>{
-    Class.findOne({code:req.body.code},(e,foundClass)=>{
-        if(e){
-            console.log(e);
-        }else{
-            Student.findOne({email:req.body.email},(e,foundUser)=>{
-                if(e){
-                    console.log(e);
-                }else{
-                    const newPost =  new Post({
-                        author:foundUser.name,
-                        title:req.body.title,
-                        description:req.body.desc,
-                        posttime: new Date().toString().slice(4,24)
-                    });
-                    if(req.files){
-                        newPost.files=req.files.map(a=>a.filename);
-                    }
-                    newPost.save((e)=>{
-                        if(e){
-                            console.log(e);
-                        }else{
-                            foundClass.posts.push(newPost);
-                            foundClass.save((e)=>{
-                                Student.find().where('_id').in(foundClass.students).exec((err, records) => {
-                                    if(err){
-                                        console.log(err);
-                                    }else{
-                                        res.render("sclass",{
-                                            code:foundClass.code,
-                                            name:foundClass.teacher,
-                                            email:req.body.email,
-                                            classname:foundClass.name,
-                                            students:records,
-                                            posts:foundClass.posts,
-                                            tests:foundClass.tests,
-                                            assign:foundClass.assign
-                                        });
-                                    }
-                                });
-                            });
-                        }
-                    });
-                }
-            });
-        }
-    });
-});
-
-app.post("/home",(req,res)=>{
-    Teacher.findOne({email:req.body.email},(e,foundUser)=>{
-        if(e){
-            console.log(e);
-        }else{
-            res.render("teacher",{
-                name:foundUser.name,
-                email:foundUser.email,
-                classes:foundUser.classes,
-                error:""
-            });
-        }
-    });
-});
-
-app.post("/shome",(req,res)=>{
-    Student.findOne({email:req.body.email},(e,foundUser)=>{
-        if(e){
-            console.log(e);
-        }else{
-            res.render("student",{
-                name:foundUser.name,
-                email:foundUser.email,
-                classes:foundUser.classes,
-                error:""
-            });
-        }
-    });
-});
-
-app.post("/class",(req,res)=>{
-    Class.findOne({code:req.body.code},(e,foundClass)=>{
-        if(e){
-            console.log(e);
-        }else{
-            Student.find().where('_id').in(foundClass.students).exec((err, records) => {
-                if(err){
-                    console.log(err);
-                }else{
-                    checkdue();
-                    res.render("class",{
-                        code:foundClass.code,
-                        name:foundClass.teacher,
-                        email:req.body.email,
-                        classname:foundClass.name,
-                        students:records,
-                        posts:foundClass.posts,
-                        tests:foundClass.tests,
-                        assign:foundClass.assign
-                    });
-                }
-            });
-        }
-    });
-});
-
-app.post("/sclass",(req,res)=>{
-    Class.findOne({code:req.body.code},(e,foundClass)=>{
-        if(e){
-            console.log(e);
-        }else{
-            Student.find().where('_id').in(foundClass.students).exec((err, records) => {
-                if(err){
-                    console.log(err);
-                }else{
-                    res.render("sclass",{
-                        name:foundClass.teacher,
-                        email:req.body.email,
-                        classname:foundClass.name,
-                        students:records,
-                        code:foundClass.code,
-                        posts:foundClass.posts,
-                        tests:foundClass.tests,
-                        assign:foundClass.assign
-                    });
-                }
-            });
-        }
-    });
-});
-
-app.post("/createclass",(req,res)=>{
-    Class.count({}, function( err, count){
-        if(err){
-            console.log(err);
-        }else{
-            Teacher.findOne({email:req.body.email},(e,foundUser)=>{
-                if(e){
-                    console.log(e);
-                }else{
-                    if(foundUser.classes.some(e => e.name == req.body.classname)){
-                        res.render("teacher",{
-                            name:req.body.name,
-                            email: req.body.email,
-                            classes:foundUser.classes,
-                            error:"Classroom exists already!!"
-                        });
-                    }else{
-                        const newClass =  new Class({
-                            teacher:req.body.name,
-                            name:req.body.classname,
-                            code:"SL"+String(count+1).padStart(4,'0')
-                        });
-                        foundUser.classes.push(newClass);
-                        foundUser.save();
-                        newClass.save(function(err){
-                            if (err) {
-                                console.log(err);
-                            } else {
-                                checkdue();
-                                res.render("class",{
-                                    code:"SL"+String(count+1).padStart(4,'0'),
-                                    name:req.body.name,
-                                    classname:req.body.classname,
-                                    email:foundUser.email,
-                                    students:[],
-                                    posts:[],
-                                    tests:[],
-                                    assign:[]
-                                });
-                            }
-                        }); 
-                    }
-                }
-            });
-        } 
-    });
-});
-
-app.post("/joinclass",(req,res)=>{
-    Class.findOne({code:req.body.code},(e,foundClass)=>{
-        if(e){
-            console.log(e);
-        }else{
-            Student.findOne({email:req.body.email},(e,foundUser)=>{
-                if(foundClass){
-                        if(e){
-                        console.log(e);
-                    }else{
-                        if(foundUser.classes.some(e => e.code == req.body.code)){
-                            Student.find().where('_id').in(foundClass.students).exec((err, records) => {
-                                if(err){
-                                    console.log(err);
-                                }else{
-                                    res.render("sclass",{
-                                        name:foundClass.teacher,
-                                        email:req.body.email,
-                                        classname:foundClass.name,
-                                        students:records,
-                                        code:foundClass.code,
-                                        posts:foundClass.posts,
-                                        tests:foundClass.tests,
-                                        assign:foundClass.assign
-                                    });
-                                }
-                            });
-                        }else{
-                            foundUser.classes.push(foundClass);
-                            foundUser.save();
-                            foundClass.students.push(foundUser._id);
-                            foundClass.save();
-                            Student.find().where('_id').in(foundClass.students).exec((err, records) => {
-                                if(err){
-                                    console.log(err);
-                                }else{
-                                    res.render("sclass",{
-                                        name:foundClass.teacher,
-                                        email:req.body.email,
-                                        classname:foundClass.name,
-                                        students:records,
-                                        code:foundClass.code,
-                                        posts:foundClass.posts,
-                                        tests:foundClass.tests,
-                                        assign:foundClass.assign
-                                    });
-                                }
-                            });
-                        }
-                    }
-                }else{
-                    res.render("student",{
-                        name:foundUser.name,
-                        email:foundUser.email,
-                        classes:foundUser.classes,
-                        error:"Class not found!!"
-                    });
-                }
-            });
-        }
-    });
-});
-
-app.post("/stureg", function(req, res){
-    const email=req.body.email;
-    Student.findOne({email:email},(e,foundUser)=>{
-        if(e){
-            console.log(e);
-        }else{
-            if(foundUser){
-                res.render("home",{
-                    regerror:"User already registered!!",
-                    logerror:""
-                });
-            }else{
-                bcrypt.hash(req.body.password, 10, function(e, hash) {
-                    if(e){
-                        console.log(e);
-                    }else{    
-                        const newStudent =  new Student({
-                            email: req.body.email,
-                            name:req.body.name,
-                            phone:req.body.phone,
-                            password: hash,
-                            periods:[
-                                ["Monday","N/A","N/A","N/A","N/A","N/A"],
-                                ["Tuesday","N/A","N/A","N/A","N/A","N/A"],
-                                ["wednesday","N/A","N/A","N/A","N/A","N/A"],
-                                ["Thursday","N/A","N/A","N/A","N/A","N/A"],
-                                ["Friday","N/A","N/A","N/A","N/A","N/A"]
-                            ]
-                        });
-                        
-                        newStudent.save(function(err){
-                            if (err) {
-                                console.log(err);
-                            } else {
-                                res.render("student",{
-                                    name:req.body.name,
-                                    email: req.body.email,
-                                    classes:[],
-                                    error:""
-                                });
-                            }
-                        });
-                    }
-                });
-            }
-        }
-    });
-});
-
-app.post("/teareg", function(req, res){
-    const email=req.body.email;
-    Teacher.findOne({email:email},(e,foundUser)=>{
-        if(e){
-            console.log(e);
-        }else{
-            if(foundUser){
-                res.render("home",{
-                    regerror:"User already registered!!",
-                    logerror:""
-                });
-            }else{
-                bcrypt.hash(req.body.password, 10, function(e, hash) {
-                    if(e){
-                        console.log(e);
-                    }else{    
-                        const newTeacher =  new Teacher({
-                            email: req.body.email,
-                            name:req.body.name,
-                            phone:req.body.phone,
-                            password: hash,
-                            periods:[
-                                ["Monday","N/A","N/A","N/A","N/A","N/A"],
-                                ["Tuesday","N/A","N/A","N/A","N/A","N/A"],
-                                ["wednesday","N/A","N/A","N/A","N/A","N/A"],
-                                ["Thursday","N/A","N/A","N/A","N/A","N/A"],
-                                ["Friday","N/A","N/A","N/A","N/A","N/A"]
-                            ]
-                        });
-                        
-                        newTeacher.save(function(err){
-                            if (err) {
-                                console.log(err);
-                            } else {
-                                res.render("teacher",{
-                                    name:req.body.name,
-                                    email: req.body.email,
-                                    classes:[],
-                                    error:""
-                                });
-                            }
-                        });
-                    }
-                });
-            }
-        }
-    });
-});
-
-app.post("/stulog", function(req, res){
-    const email=req.body.email;
-    const password=req.body.password;
-          
-    Student.findOne({email: email}, function(err, foundUser){
-        if (err) {
-            console.log(err);
-        } else {
-            if (foundUser) {
-                bcrypt.compare(password, foundUser.password, function(err, result) {
-                    if (result === true) {
-                        res.render("student",{
-                            name:foundUser.name,
-                            email:foundUser.email,
-                            classes:foundUser.classes,
-                            error:""
-                        });
-                    }else{
-                        res.render("home",{
-                            regerror:"",
-                            logerror:"Invalid username or password!!"
-                        });
-                    }
-                });
-            }else{
-                res.render("home",{
-                    regerror:"",
-                    logerror:"Invalid username or password!!"
-                });
-            }
-        }
-    });
-});
-
-app.post("/tealog", function(req, res){
-    const email=req.body.email;
-    const password = req.body.password;
-
-    Teacher.findOne({email: email}, function(err, foundUser){
-        if (err) {
-            console.log(err);
-        } else {
-            if (foundUser) {
-                bcrypt.compare(password, foundUser.password, function(err, result) {
-                    if (result === true) {
-                        res.render("teacher",{
-                            name:foundUser.name,
-                            email:foundUser.email,
-                            classes:foundUser.classes,
-                            error:""
-                        });
-                    }else{
-                        res.render("home",{
-                            regerror:"",
-                            logerror:"Invalid username or password!!"
-                        });
-                    }
-                });
-            }else{
-                res.render("home",{
-                    regerror:"",
-                    logerror:"Invalid username or password!!"
-                });
-            }
-        }
-    });
-});
-  
 app.listen(process.env.PORT || 3000,()=>{
     console.log("server is up and running");
 });
