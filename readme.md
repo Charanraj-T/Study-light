@@ -2,10 +2,6 @@
 
 An online platform to make learning and teaching easy
 
-Give a try:
-
-    https://studylight.herokuapp.com/
-
 ## Features in current version
 
 1. User can register as teacher and student
